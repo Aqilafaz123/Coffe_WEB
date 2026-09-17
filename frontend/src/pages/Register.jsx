@@ -177,7 +177,7 @@ export default function Register() {
                     style={{ color: '#2c1810', caretColor: '#c9a227' }}
                     required
                   />
-                  <button type="button" onClick={() => setShowPass(!s => !s)} className="active:scale-90 transition-transform" style={{ color: '#c4a07a' }}>
+                  <button type="button" onClick={() => setShowPass(s => !s)} className="active:scale-90 transition-transform" style={{ color: '#c4a07a' }}>
                     {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
