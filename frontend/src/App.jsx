@@ -23,6 +23,7 @@ import Location from './pages/Location';
 import AdminRooms from './pages/admin/AdminRooms';
 import StaffReservations from './pages/staff/StaffReservations';
 import QueueStatus from './pages/QueueStatus';
+import TrackOrder from './pages/TrackOrder';
 
 export default function App() {
   return (
@@ -36,6 +37,10 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/reservasi" element={<Reservasi />} />
             <Route path="/lokasi" element={<Location />} />
+            <Route path="/pantau-pesanan" element={<TrackOrder />} />
+            <Route path="/pantau" element={<TrackOrder />} />
+            <Route path="/antrian" element={<TrackOrder />} />
+            <Route path="/lacak-pesanan" element={<TrackOrder />} />
             <Route path="/keranjang" element={
               <ProtectedRoute roles={['user', 'cashier', 'superadmin']}>
                 <Cart />
@@ -66,11 +71,7 @@ export default function App() {
                 <PaymentFinish />
               </ProtectedRoute>
             } />
-            <Route path="/antrian/:orderId" element={
-              <ProtectedRoute roles={['user', 'cashier', 'superadmin']}>
-                <QueueStatus />
-              </ProtectedRoute>
-            } />
+            <Route path="/antrian/:orderId" element={<QueueStatus />} />
             <Route path="/kasir" element={
               <ProtectedRoute roles={['cashier']}>
                 <CashierDashboard />

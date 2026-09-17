@@ -104,11 +104,16 @@ export default function QueueStatus() {
       <div className="min-h-screen flex flex-col items-center justify-center px-5 py-12 relative">
         <div className="w-full max-w-sm">
 
-          {/* Back button */}
-          <Link to="/riwayat" className="su inline-flex items-center gap-2 mb-8 text-sm font-medium transition-all hover:opacity-70" style={{ color: '#8b5e3c' }}>
-            <ChevronLeft size={18} />
-            Riwayat Pesanan
-          </Link>
+          {/* Navigation Links */}
+          <div className="su flex items-center justify-between mb-8">
+            <Link to="/pantau-pesanan" className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all hover:opacity-75" style={{ color: '#8b5e3c' }}>
+              <ChevronLeft size={18} />
+              Papan Antrian
+            </Link>
+            <Link to="/riwayat" className="text-xs font-medium hover:underline" style={{ color: '#a67c52' }}>
+              Riwayat Saya →
+            </Link>
+          </div>
 
           {/* Logo */}
           <div className="su flex flex-col items-center mb-8">

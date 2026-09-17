@@ -38,6 +38,9 @@
     <div class="meta">
         <table>
             <tr><td>No. Pesanan</td><td><strong>{{ $order->order_number }}</strong></td></tr>
+            @if($order->queue_number)
+            <tr><td>No. Antrian</td><td><strong style="font-size: 15px; color: #8b6914;">#{{ str_pad($order->queue_number, 3, '0', STR_PAD_LEFT) }}</strong></td></tr>
+            @endif
             <tr><td>Tanggal</td><td>{{ $order->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</td></tr>
             <tr><td>Pelanggan</td><td>{{ $order->customer_name }}</td></tr>
             @if($order->user?->email)

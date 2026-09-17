@@ -127,6 +127,26 @@ export default function UserHistory() {
               </div>
             ) : (
               <div className="space-y-4">
+                {orders.some((o) => ['pending', 'preparing'].includes(o.status)) && (
+                  <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-coffee-900 to-coffee-950 text-white shadow-md border border-coffee-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gold/20 flex items-center justify-center text-gold shrink-0">
+                        <Clock size={22} className="animate-pulse" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm text-white">Pesanan Anda Sedang Diproses!</h4>
+                        <p className="text-xs text-white/70">Pantau pergerakan antrian pesanan kopi Anda secara live.</p>
+                      </div>
+                    </div>
+                    <Link
+                      to="/pantau-pesanan"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-gold hover:bg-gold/90 text-coffee-950 rounded-xl text-xs font-bold text-center transition-all shadow shrink-0"
+                    >
+                      Buka Papan Pantau ➔
+                    </Link>
+                  </div>
+                )}
+
                 {orders.map((order) => {
                   const status = order.status === 'awaiting_payment' && order.payment_method === 'cash'
                     ? { label: 'Bayar di Kasir', color: 'bg-amber-100 text-amber-800', icon: Wallet }
@@ -136,7 +156,12 @@ export default function UserHistory() {
                     <div key={order.id} className="bg-white rounded-2xl p-6 shadow-sm">
                       <div className="flex items-center justify-between mb-4 gap-4">
                         <div>
-                          <p className="font-semibold text-coffee-900">{order.order_number}</p>
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <p className="font-semibold text-coffee-900">{order.order_number}</p>
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                              🎫 No. Antrian #{String(order.queue_number || order.id).padStart(3, '0')}
+                            </span>
+                          </div>
                           <p className="text-coffee-500 text-sm">{new Date(order.created_at).toLocaleString('id-ID')}</p>
                         </div>
                         <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shrink-0 ${status.color}`}>
@@ -180,13 +205,22 @@ export default function UserHistory() {
                         </p>
                       )}
                       <div className="flex flex-wrap gap-3 items-center pt-1 border-t border-coffee-100">
+                        {/* Pantau Antrian Button */}
+                        <Link
+                          to={`/antrian/${order.id}`}
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-coffee-900 text-white text-xs sm:text-sm font-semibold rounded-full hover:bg-coffee-800 transition-all shadow-sm active:scale-95"
+                        >
+                          <Clock size={14} />
+                          Pantau Antrian
+                        </Link>
+
                         {order.status === 'awaiting_payment' && order.payment_method === 'cash' && (
-                          <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 border-2 border-amber-300 text-amber-800 text-sm rounded-full hover:bg-amber-50">
+                          <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 border-2 border-amber-300 text-amber-800 text-xs sm:text-sm rounded-full hover:bg-amber-50">
                             Lihat Instruksi Bayar
                           </Link>
                         )}
                         {order.status === 'awaiting_payment' && order.payment_method !== 'cash' && (
-                          <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block text-sm">
+                          <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block text-xs sm:text-sm">
                             Bayar Sekarang
                           </Link>
                         )}

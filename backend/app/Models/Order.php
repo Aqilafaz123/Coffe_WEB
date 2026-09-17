@@ -17,6 +17,34 @@ class Order extends Model
 
     protected $appends = ['customer_name'];
 
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order) {
+            if (is_null($order->queue_number)) {
+                $maxQueue = static::whereDate('created_at', today())
+                    ->whereNotNull('queue_number')
+                    ->max('queue_number') ?? 0;
+                $order->queue_number = $maxQueue + 1;
+            }
+        });
+    }
+
+    public function assignQueueNumber(): int
+    {
+        if (! is_null($this->queue_number)) {
+            return $this->queue_number;
+        }
+
+        $maxQueue = static::whereDate('created_at', $this->created_at ?? today())
+            ->whereNotNull('queue_number')
+            ->max('queue_number') ?? 0;
+
+        $this->queue_number = $maxQueue + 1;
+        $this->save();
+
+        return $this->queue_number;
+    }
+
     public function getCustomerNameAttribute(): string
     {
         return $this->user?->name ?? $this->guest_name ?? '-';

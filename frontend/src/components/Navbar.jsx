@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X, User, LogOut, History } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, User, LogOut, History, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import api, { formatPrice } from '../lib/api';
@@ -8,6 +8,7 @@ import api, { formatPrice } from '../lib/api';
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/shop', label: 'Shop' },
+  { to: '/pantau-pesanan', label: 'Pantau Pesanan', isSpecial: true },
   { to: '/reservasi', label: 'Reservasi' },
   { to: '/shop?category=hot-coffee', label: 'Coffee' },
   { to: '/shop?category=dessert', label: 'Bakery' },
@@ -82,13 +83,18 @@ export default function Navbar() {
             COFFEE
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 to={link.to}
-                className="text-white/80 hover:text-white text-sm font-medium tracking-wide uppercase transition-colors"
+                className={
+                  link.isSpecial
+                    ? 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/20 text-gold hover:bg-gold/30 text-xs font-bold tracking-wider uppercase border border-gold/40 transition-all hover:scale-105 shadow-sm'
+                    : 'text-white/80 hover:text-white text-sm font-medium tracking-wide uppercase transition-colors'
+                }
               >
+                {link.isSpecial && <Clock size={13} className="text-gold animate-pulse" />}
                 {link.label}
               </Link>
             ))}
@@ -220,14 +226,26 @@ export default function Navbar() {
         <div className="md:hidden bg-coffee-900/95 backdrop-blur-lg border-t border-white/10 animate-fade-in">
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.to}
-                onClick={() => setOpen(false)}
-                className="block text-white/80 hover:text-white py-2 text-sm font-medium tracking-wide uppercase"
-              >
-                {link.label}
-              </Link>
+              link.isSpecial ? (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 text-gold font-bold py-2.5 px-3 rounded-xl bg-gold/15 border border-gold/30 text-sm tracking-wide uppercase shadow-sm"
+                >
+                  <Clock size={16} className="text-gold animate-pulse" />
+                  {link.label}
+                </Link>
+              ) : (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  onClick={() => setOpen(false)}
+                  className="block text-white/80 hover:text-white py-2 text-sm font-medium tracking-wide uppercase"
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
             {user ? (
               <>

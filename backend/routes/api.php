@@ -28,6 +28,11 @@ Route::get('/rooms/{room}/availability', [RoomController::class, 'availability']
 Route::post('/subscribe', [SubscriberController::class, 'subscribe']);
 Route::post('/midtrans/notification', [MidtransController::class, 'notification']);
 
+// Public queue routes (accessible by customers / guests)
+Route::get('/queue/now-serving', [QueueController::class, 'nowServing']);
+Route::get('/queue/track', [QueueController::class, 'track']);
+Route::get('/queue/status', [QueueController::class, 'status']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -50,8 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations/{reservation}', [RoomReservationController::class, 'show']);
     Route::post('/reservations/{reservation}/cancel', [RoomReservationController::class, 'cancel']);
 
-    // Queue routes
-    Route::get('/queue/status', [QueueController::class, 'status']);
+    // Queue routes (authenticated)
+    Route::get('/queue/active', [QueueController::class, 'active']);
 
     Route::middleware('role:cashier,superadmin')->group(function () {
         Route::patch('/reservations/{reservation}/status', [RoomReservationController::class, 'updateStatus']);

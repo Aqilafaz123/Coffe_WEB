@@ -28,11 +28,19 @@ class OrderPaymentService
                 }
             }
 
+            if (is_null($order->queue_number)) {
+                $maxQueue = Order::whereDate('created_at', today())
+                    ->whereNotNull('queue_number')
+                    ->max('queue_number') ?? 0;
+                $order->queue_number = $maxQueue + 1;
+            }
+
             $order->update([
                 'payment_method' => $paymentMethod,
                 'payment_status' => 'paid',
                 'status' => 'pending',
                 'paid_at' => now(),
+                'queue_number' => $order->queue_number,
                 'midtrans_transaction_id' => $transactionId ?? $order->midtrans_transaction_id,
             ]);
 

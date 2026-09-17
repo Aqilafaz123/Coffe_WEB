@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Coffee, Snowflake, CupSoda, Cake, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Coffee, Snowflake, CupSoda, Cake, ChevronLeft, ChevronRight, ArrowRight, Clock } from 'lucide-react';
 import api from '../lib/api';
 import ProductCard from '../components/ProductCard';
 import Navbar from '../components/Navbar';
@@ -66,10 +66,16 @@ export default function Home() {
             <p className="text-white/70 text-lg mb-8 leading-relaxed">
               Nikmati cita rasa kopi premium yang diseduh dengan penuh passion oleh barista profesional kami.
             </p>
-            <Link to="/shop" className="inline-flex items-center gap-2 bg-white text-coffee-900 px-8 py-4 rounded-full font-semibold hover:bg-coffee-100 transition-all hover:shadow-xl hover:shadow-black/20 active:scale-95">
-              Order Now
-              <ArrowRight size={18} />
-            </Link>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link to="/shop" className="inline-flex items-center gap-2 bg-white text-coffee-900 px-8 py-4 rounded-full font-semibold hover:bg-coffee-100 transition-all hover:shadow-xl hover:shadow-black/20 active:scale-95">
+                Order Now
+                <ArrowRight size={18} />
+              </Link>
+              <Link to="/pantau-pesanan" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white border border-white/30 px-6 py-4 rounded-full font-semibold hover:bg-white/25 transition-all active:scale-95">
+                <Clock size={18} className="text-gold animate-pulse" />
+                Pantau Pesanan
+              </Link>
+            </div>
           </div>
         </div>
       </section>
