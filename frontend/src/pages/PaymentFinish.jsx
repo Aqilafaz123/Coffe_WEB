@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
@@ -41,16 +41,28 @@ export default function PaymentFinish() {
             </div>
           )}
           {status === 'success' && (
-            <div className="py-16 bg-white rounded-2xl">
+            <div className="py-16 bg-white rounded-2xl px-6">
               <CheckCircle size={56} className="mx-auto text-green-500 mb-4" />
               <h1 className="font-display text-2xl font-bold text-coffee-900 mb-2">Pembayaran Berhasil!</h1>
               <p className="text-coffee-500 mb-2">No. Pesanan: {order?.order_number}</p>
               <p className="text-coffee-500 mb-6">Pesanan Anda sedang diproses.</p>
+
+              {/* Queue CTA */}
+              {order && (
+                <Link
+                  to={`/antrian/${order.id}`}
+                  className="flex items-center justify-center gap-2 w-full max-w-xs mx-auto mb-4 py-3.5 px-6 rounded-2xl font-semibold text-sm transition-all hover:opacity-90 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg, #2c1810 0%, #5c3a28 100%)', color: '#faf8f5', boxShadow: '0 6px 20px rgba(44,24,16,0.2)' }}
+                >
+                  🎫 Pantau Nomor Antrian
+                </Link>
+              )}
+
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 {order && (
                   <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
                 )}
-                <button onClick={() => navigate(donePath)} className="btn-primary">Lihat Pesanan</button>
+                <button onClick={() => navigate(donePath)} className="btn-outline">Lihat Pesanan</button>
               </div>
             </div>
           )}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MidtransController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\QueueController;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\RoomReservationController;
 use App\Http\Controllers\Api\SubscriberController;
@@ -49,15 +50,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reservations/{reservation}', [RoomReservationController::class, 'show']);
     Route::post('/reservations/{reservation}/cancel', [RoomReservationController::class, 'cancel']);
 
+    // Queue routes
+    Route::get('/queue/status', [QueueController::class, 'status']);
+
     Route::middleware('role:cashier,superadmin')->group(function () {
         Route::patch('/reservations/{reservation}/status', [RoomReservationController::class, 'updateStatus']);
         Route::get('/customers', [UserController::class, 'customers']);
         Route::post('/customers', [UserController::class, 'storeCustomer']);
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+        // Queue — cashier actions
+        Route::get('/queue/current', [QueueController::class, 'current']);
+        Route::patch('/queue/call', [QueueController::class, 'call']);
     });
 
     Route::middleware('role:superadmin')->group(function () {
+        // Queue reset
+        Route::post('/queue/reset', [QueueController::class, 'reset']);
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{category}', [CategoryController::class, 'update']);
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);

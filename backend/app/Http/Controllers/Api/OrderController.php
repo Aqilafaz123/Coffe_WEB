@@ -241,11 +241,21 @@ class OrderController extends Controller
             return response()->json(['message' => 'Pesanan harus dibayar terlebih dahulu.'], 422);
         }
 
-        $order->update([
-            'status' => $validated['status'],
+        $updateData = [
+            'status'       => $validated['status'],
             'processed_by' => $request->user()->id,
             'completed_at' => $validated['status'] === 'completed' ? now() : null,
-        ]);
+        ];
+
+        // Auto-assign daily queue number when order moves to 'pending'
+        if ($validated['status'] === 'pending' && is_null($order->queue_number)) {
+            $maxQueue = Order::whereDate('created_at', today())
+                ->whereNotNull('queue_number')
+                ->max('queue_number') ?? 0;
+            $updateData['queue_number'] = $maxQueue + 1;
+        }
+
+        $order->update($updateData);
 
         return response()->json($order->load(['user', 'items.product', 'processor']));
     }

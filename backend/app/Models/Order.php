@@ -12,6 +12,7 @@ class Order extends Model
         'order_number', 'user_id', 'guest_name', 'guest_phone', 'table_location', 'status',
         'payment_method', 'midtrans_transaction_id', 'payment_status', 'paid_at',
         'subtotal', 'discount', 'voucher_code', 'total', 'notes', 'processed_by', 'completed_at',
+        'queue_number', 'queue_called_at',
     ];
 
     protected $appends = ['customer_name'];
@@ -29,6 +30,7 @@ class Order extends Model
             'total' => 'decimal:2',
             'completed_at' => 'datetime',
             'paid_at' => 'datetime',
+            'queue_called_at' => 'datetime',
         ];
     }
 

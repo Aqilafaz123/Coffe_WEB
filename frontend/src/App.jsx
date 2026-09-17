@@ -22,6 +22,7 @@ import Reservasi from './pages/Reservasi';
 import Location from './pages/Location';
 import AdminRooms from './pages/admin/AdminRooms';
 import StaffReservations from './pages/staff/StaffReservations';
+import QueueStatus from './pages/QueueStatus';
 
 export default function App() {
   return (
@@ -63,6 +64,11 @@ export default function App() {
             <Route path="/pembayaran/:orderId/selesai" element={
               <ProtectedRoute roles={['user', 'cashier', 'superadmin']}>
                 <PaymentFinish />
+              </ProtectedRoute>
+            } />
+            <Route path="/antrian/:orderId" element={
+              <ProtectedRoute roles={['user', 'cashier', 'superadmin']}>
+                <QueueStatus />
               </ProtectedRoute>
             } />
             <Route path="/kasir" element={
