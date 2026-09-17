@@ -1,0 +1,37 @@
+# Root .gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.idea/
+.vscode/
+*.suo
+*.user
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+
+# Backend (Laravel) - covered by backend/.gitignore
+# but added here as safety net
+backend/vendor/
+backend/.env
+backend/storage/logs/*.log
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+
+# Frontend (Vue/React/Vite) - covered by frontend/.gitignore
+# but added here as safety net
+frontend/node_modules/
+frontend/dist/
+frontend/.env

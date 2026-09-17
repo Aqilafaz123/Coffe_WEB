@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Outfit', sans-serif;
+  --color-coffee-950: #1a0f0a;
+  --color-coffee-900: #2c1810;
+  --color-coffee-800: #3d2317;
+  --color-coffee-700: #5c3a28;
+  --color-coffee-600: #8b5e3c;
+  --color-coffee-500: #a67c52;
+  --color-coffee-400: #c4a07a;
+  --color-coffee-300: #d4b896;
+  --color-coffee-200: #e8d5c4;
+  --color-coffee-100: #f5f0eb;
+  --color-coffee-50: #faf8f5;
+  --color-cream: #faf6f1;
+  --color-gold: #c9a227;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-coffee-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.glass-nav {
+  background: rgba(26, 15, 10, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(44, 24, 16, 0.12);
+}
+
+.btn-primary {
+  @apply bg-coffee-900 text-white px-6 py-3 rounded-full font-medium
+         hover:bg-coffee-800 transition-all duration-300
+         hover:shadow-lg hover:shadow-coffee-900/20 active:scale-95;
+}
+
+.btn-outline {
+  @apply border-2 border-coffee-900 text-coffee-900 px-6 py-3 rounded-full font-medium
+         hover:bg-coffee-900 hover:text-white transition-all duration-300 active:scale-95;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 rounded-xl border border-coffee-200 bg-white
+         focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-transparent
+         transition-all duration-200;
+}
+
+.section-title {
+  @apply font-display text-3xl md:text-4xl font-bold text-coffee-900 text-center;
+}
