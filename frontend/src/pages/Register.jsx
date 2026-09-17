@@ -34,85 +34,113 @@ export default function Register() {
     }
   };
 
-  const inputStyle = (field) => ({
-    background: focusedField === field ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)',
-    border: focusedField === field ? '1px solid rgba(201,162,39,0.6)' : '1px solid rgba(255,255,255,0.1)',
-  });
-
-  const iconColor = (field) => focusedField === field ? '#c9a227' : 'rgba(196,160,122,0.5)';
+  const inputBg = (field) => focusedField === field ? '#ffffff' : '#f0ebe4';
+  const inputBorder = (field) => `1.5px solid ${focusedField === field ? '#c9a227' : '#e8d5c4'}`;
+  const iconColor = (field) => focusedField === field ? '#c9a227' : '#c4a07a';
 
   const fields = [
-    { name: 'name', label: 'Nama Lengkap', type: 'text', placeholder: 'Nama kamu', Icon: User, required: true },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'kamu@email.com', Icon: Mail, required: true },
-    { name: 'phone', label: 'Nomor Telepon', type: 'tel', placeholder: '08xx-xxxx-xxxx', Icon: Phone, required: false },
+    { name: 'name',  label: 'Nama Lengkap',    type: 'text',  placeholder: 'Nama kamu',         Icon: User,  required: true  },
+    { name: 'email', label: 'Email',            type: 'email', placeholder: 'kamu@email.com',    Icon: Mail,  required: true  },
+    { name: 'phone', label: 'Nomor Telepon',    type: 'tel',   placeholder: '08xx-xxxx-xxxx',    Icon: Phone, required: false },
   ];
 
-  return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a0f0a 0%, #2c1810 40%, #3d2317 100%)' }}>
+  const passwordMatch = form.password && form.password_confirmation && form.password === form.password_confirmation;
+  const passwordMismatch = form.password && form.password_confirmation && form.password !== form.password_confirmation;
 
-      {/* Decorative blobs */}
-      <div className="absolute top-0 right-0 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: 'radial-gradient(circle, #c9a227, transparent)' }} />
-      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: 'radial-gradient(circle, #8b5e3c, transparent)' }} />
+  return (
+    <div className="min-h-screen relative overflow-hidden" style={{ background: '#faf8f5' }}>
+
+      {/* Blobs */}
+      <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(201,162,39,0.16) 0%, transparent 70%)' }} />
+      <div className="absolute -bottom-20 -left-20 w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(92,58,40,0.1) 0%, transparent 70%)' }} />
+
+      {/* Dot pattern */}
+      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-30" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dots-r" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1" fill="#c9a227" opacity="0.25" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dots-r)" />
+      </svg>
 
       <style>{`
         @keyframes slide-up {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        .slide-up { animation: slide-up 0.6s ease-out forwards; }
-        .slide-up-d1 { animation: slide-up 0.6s ease-out 0.1s both; }
-        .slide-up-d2 { animation: slide-up 0.6s ease-out 0.2s both; }
-        .slide-up-d3 { animation: slide-up 0.6s ease-out 0.3s both; }
+        .su  { animation: slide-up 0.55s ease-out both; }
+        .su1 { animation: slide-up 0.55s 0.08s ease-out both; }
+        .su2 { animation: slide-up 0.55s 0.16s ease-out both; }
+        .su3 { animation: slide-up 0.55s 0.24s ease-out both; }
+        .su4 { animation: slide-up 0.55s 0.32s ease-out both; }
+        .su5 { animation: slide-up 0.55s 0.40s ease-out both; }
+        .input-wrap { transition: box-shadow 0.25s, border-color 0.25s, background 0.25s; }
+        .input-wrap:focus-within { box-shadow: 0 0 0 3px rgba(201,162,39,0.15); }
+        .btn-reg { transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-reg:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(44,24,16,0.25); }
+        .btn-reg:active:not(:disabled) { transform: scale(0.98); }
       `}</style>
 
-      <div className="min-h-screen flex items-center justify-center px-5 py-10">
-        <div className="w-full max-w-sm lg:max-w-md">
+      <div className="min-h-screen flex items-center justify-center px-5 py-12 relative">
+        <div className="w-full max-w-[380px] lg:max-w-[420px]">
 
           {/* Logo */}
-          <div className="slide-up flex flex-col items-center mb-7">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'rgba(201,162,39,0.15)', border: '1px solid rgba(201,162,39,0.3)' }}>
-              <Coffee size={28} color="#c9a227" />
+          <div className="su flex flex-col items-center mb-8">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+              style={{ background: 'linear-gradient(135deg, #2c1810 0%, #5c3a28 100%)', boxShadow: '0 8px 24px rgba(44,24,16,0.2)' }}
+            >
+              <Coffee size={30} color="#c9a227" />
             </div>
-            <Link to="/" className="font-display text-2xl font-bold text-white tracking-wide">COFFEE</Link>
+            <Link to="/" className="font-display text-3xl font-bold tracking-widest" style={{ color: '#2c1810' }}>COFFEE</Link>
+            <div className="flex items-center gap-1 mt-2">
+              <div className="h-0.5 w-8 rounded-full" style={{ background: '#c9a227' }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#c9a227' }} />
+              <div className="h-0.5 w-8 rounded-full" style={{ background: '#c9a227' }} />
+            </div>
           </div>
 
           {/* Card */}
           <div
-            className="slide-up-d1 rounded-3xl p-7"
+            className="su1 rounded-3xl p-7"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: '0 32px 64px rgba(0,0,0,0.4)',
+              background: 'rgba(255,255,255,0.7)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1.5px solid #e8d5c4',
+              boxShadow: '0 20px 60px rgba(44,24,16,0.1), 0 4px 12px rgba(44,24,16,0.06)',
             }}
           >
-            {/* Header */}
             <div className="mb-6">
-              <h2 className="font-display text-2xl font-bold text-white mb-1">Buat Akun</h2>
-              <p style={{ color: 'rgba(196,160,122,0.8)', fontSize: '14px' }}>Daftar dan nikmati kopi terbaik kami</p>
+              <h2 className="font-display text-2xl font-bold mb-1" style={{ color: '#2c1810' }}>Buat Akun Baru</h2>
+              <p className="text-sm" style={{ color: '#a67c52' }}>Daftar dan mulai nikmati kopi terbaik kami</p>
             </div>
 
             {/* Error */}
             {error && (
-              <div className="mb-5 px-4 py-3 rounded-2xl flex items-start gap-3 text-sm" style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5' }}>
+              <div className="mb-5 px-4 py-3 rounded-2xl flex items-start gap-3 text-sm"
+                style={{ background: '#fff1f0', border: '1px solid #fecaca', color: '#b91c1c' }}>
                 <span className="mt-0.5">⚠</span>
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Text fields */}
-              {fields.map(({ name, label, type, placeholder, Icon, required }) => (
-                <div key={name} className="slide-up-d2">
-                  <label className="block text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: 'rgba(201,162,39,0.8)' }}>
+
+              {/* Basic fields */}
+              {fields.map(({ name, label, type, placeholder, Icon, required }, i) => (
+                <div key={name} className={`su${i + 2}`}>
+                  <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#8b5e3c' }}>
                     {label}
                   </label>
                   <div
-                    className="flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all duration-300"
-                    style={inputStyle(name)}
+                    className="input-wrap flex items-center gap-3 rounded-2xl px-4 py-4"
+                    style={{ background: inputBg(name), border: inputBorder(name) }}
                   >
-                    <Icon size={16} color={iconColor(name)} style={{ flexShrink: 0, transition: 'color 0.3s' }} />
+                    <Icon size={17} style={{ flexShrink: 0, color: iconColor(name), transition: 'color 0.25s' }} />
                     <input
                       type={type}
                       name={name}
@@ -122,7 +150,7 @@ export default function Register() {
                       onBlur={() => setFocusedField('')}
                       placeholder={placeholder}
                       className="flex-1 bg-transparent outline-none text-sm"
-                      style={{ color: 'white', caretColor: '#c9a227' }}
+                      style={{ color: '#2c1810', caretColor: '#c9a227' }}
                       required={required}
                     />
                   </div>
@@ -130,13 +158,13 @@ export default function Register() {
               ))}
 
               {/* Password */}
-              <div className="slide-up-d2">
-                <label className="block text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: 'rgba(201,162,39,0.8)' }}>Password</label>
+              <div className="su4">
+                <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#8b5e3c' }}>Password</label>
                 <div
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all duration-300"
-                  style={inputStyle('password')}
+                  className="input-wrap flex items-center gap-3 rounded-2xl px-4 py-4"
+                  style={{ background: inputBg('password'), border: inputBorder('password') }}
                 >
-                  <Lock size={16} color={iconColor('password')} style={{ flexShrink: 0, transition: 'color 0.3s' }} />
+                  <Lock size={17} style={{ flexShrink: 0, color: iconColor('password'), transition: 'color 0.25s' }} />
                   <input
                     type={showPass ? 'text' : 'password'}
                     name="password"
@@ -146,23 +174,30 @@ export default function Register() {
                     onBlur={() => setFocusedField('')}
                     placeholder="Min. 8 karakter"
                     className="flex-1 bg-transparent outline-none text-sm"
-                    style={{ color: 'white', caretColor: '#c9a227' }}
+                    style={{ color: '#2c1810', caretColor: '#c9a227' }}
                     required
                   />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="active:scale-90 transition-transform" style={{ color: 'rgba(196,160,122,0.6)' }}>
-                    {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                  <button type="button" onClick={() => setShowPass(!s => !s)} className="active:scale-90 transition-transform" style={{ color: '#c4a07a' }}>
+                    {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
               </div>
 
               {/* Confirm Password */}
-              <div className="slide-up-d3">
-                <label className="block text-xs font-semibold mb-2 uppercase tracking-widest" style={{ color: 'rgba(201,162,39,0.8)' }}>Konfirmasi Password</label>
+              <div className="su5">
+                <label className="block text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: '#8b5e3c' }}>Konfirmasi Password</label>
                 <div
-                  className="flex items-center gap-3 rounded-2xl px-4 py-3.5 transition-all duration-300"
-                  style={inputStyle('password_confirmation')}
+                  className="input-wrap flex items-center gap-3 rounded-2xl px-4 py-4"
+                  style={{
+                    background: inputBg('password_confirmation'),
+                    border: passwordMismatch
+                      ? '1.5px solid #fca5a5'
+                      : passwordMatch
+                      ? '1.5px solid #86efac'
+                      : inputBorder('password_confirmation'),
+                  }}
                 >
-                  <Lock size={16} color={iconColor('password_confirmation')} style={{ flexShrink: 0, transition: 'color 0.3s' }} />
+                  <Lock size={17} style={{ flexShrink: 0, color: iconColor('password_confirmation'), transition: 'color 0.25s' }} />
                   <input
                     type={showPassConf ? 'text' : 'password'}
                     name="password_confirmation"
@@ -172,43 +207,36 @@ export default function Register() {
                     onBlur={() => setFocusedField('')}
                     placeholder="Ulangi password"
                     className="flex-1 bg-transparent outline-none text-sm"
-                    style={{ color: 'white', caretColor: '#c9a227' }}
+                    style={{ color: '#2c1810', caretColor: '#c9a227' }}
                     required
                   />
-                  <button type="button" onClick={() => setShowPassConf(!showPassConf)} className="active:scale-90 transition-transform" style={{ color: 'rgba(196,160,122,0.6)' }}>
-                    {showPassConf ? <EyeOff size={16} /> : <Eye size={16} />}
+                  <button type="button" onClick={() => setShowPassConf(s => !s)} className="active:scale-90 transition-transform" style={{ color: '#c4a07a' }}>
+                    {showPassConf ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
+                {passwordMatch && (
+                  <p className="text-xs mt-1.5 flex items-center gap-1.5 pl-1" style={{ color: '#16a34a' }}>
+                    <span>✓</span> Password cocok
+                  </p>
+                )}
+                {passwordMismatch && (
+                  <p className="text-xs mt-1.5 flex items-center gap-1.5 pl-1" style={{ color: '#dc2626' }}>
+                    <span>✕</span> Password tidak cocok
+                  </p>
+                )}
               </div>
 
-              {/* Password match indicator */}
-              {form.password && form.password_confirmation && (
-                <div className="flex items-center gap-2 text-xs px-1">
-                  {form.password === form.password_confirmation ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                      <span style={{ color: '#4ade80' }}>Password cocok</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                      <span style={{ color: '#f87171' }}>Password tidak cocok</span>
-                    </>
-                  )}
-                </div>
-              )}
-
               {/* Submit */}
-              <div className="pt-2">
+              <div className="pt-1">
                 <button
                   type="submit"
                   id="register-submit"
                   disabled={loading}
-                  className="w-full py-4 rounded-2xl font-semibold text-sm tracking-wide transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+                  className="btn-reg w-full py-4 rounded-2xl font-semibold text-sm tracking-wide disabled:opacity-60"
                   style={{
-                    background: loading ? 'rgba(201,162,39,0.5)' : 'linear-gradient(135deg, #c9a227 0%, #a67c52 100%)',
-                    color: '#1a0f0a',
-                    boxShadow: loading ? 'none' : '0 8px 24px rgba(201,162,39,0.35)',
+                    background: 'linear-gradient(135deg, #2c1810 0%, #5c3a28 100%)',
+                    color: '#faf8f5',
+                    boxShadow: '0 6px 20px rgba(44,24,16,0.2)',
                   }}
                 >
                   {loading ? (
@@ -219,29 +247,33 @@ export default function Register() {
                       </svg>
                       Mendaftar...
                     </span>
-                  ) : 'Daftar Sekarang →'}
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      Daftar Sekarang <span style={{ color: '#c9a227' }}>→</span>
+                    </span>
+                  )}
                 </button>
               </div>
             </form>
 
             {/* Divider */}
             <div className="flex items-center gap-3 my-5">
-              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-              <span className="text-xs" style={{ color: 'rgba(196,160,122,0.5)' }}>atau</span>
-              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+              <div className="flex-1 h-px" style={{ background: '#e8d5c4' }} />
+              <span className="text-xs" style={{ color: '#c4a07a' }}>atau</span>
+              <div className="flex-1 h-px" style={{ background: '#e8d5c4' }} />
             </div>
 
             {/* Login link */}
-            <p className="text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <p className="text-center text-sm" style={{ color: '#a67c52' }}>
               Sudah punya akun?{' '}
-              <Link to="/login" className="font-semibold hover:underline transition-all" style={{ color: '#c9a227' }}>
+              <Link to="/login" className="font-semibold hover:underline transition-all" style={{ color: '#2c1810' }}>
                 Masuk
               </Link>
             </p>
           </div>
 
-          {/* Terms note */}
-          <p className="text-center text-xs mt-5 px-4" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          {/* Terms */}
+          <p className="text-center text-xs mt-5 px-6" style={{ color: '#c4a07a' }}>
             Dengan mendaftar, kamu menyetujui syarat & ketentuan layanan kami
           </p>
         </div>
