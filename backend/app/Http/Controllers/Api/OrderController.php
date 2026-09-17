@@ -56,8 +56,8 @@ class OrderController extends Controller
         $guestPhone = null;
 
         if ($authUser->isSuperadmin() || $authUser->isCashier()) {
-            $rules['user_id'] = ['nullable', 'exists:users,id', 'required_without:guest_name'];
-            $rules['guest_name'] = ['nullable', 'string', 'max:255', 'required_without:user_id'];
+            $rules['user_id'] = ['nullable', 'exists:users,id'];
+            $rules['guest_name'] = ['nullable', 'string', 'max:255'];
             $rules['guest_phone'] = ['nullable', 'string', 'max:20'];
         }
 
@@ -70,19 +70,16 @@ class OrderController extends Controller
             $validated['notes'] = trim($staffNote.($validated['notes'] ? "\n\n".$validated['notes'] : ''));
 
             if (! empty($validated['user_id'])) {
-                $customer = User::findOrFail($validated['user_id']);
-
-                if ($customer->role !== 'user') {
-                    return response()->json([
-                        'message' => 'Pesanan hanya dapat dibuat untuk akun pelanggan (user).',
-                    ], 422);
-                }
-
-                $orderUserId = $customer->id;
-            } else {
+                $customer = User::find($validated['user_id']);
+                $orderUserId = $customer ? $customer->id : $authUser->id;
+            } elseif (! empty($validated['guest_name'])) {
                 $orderUserId = null;
-                $guestName = $validated['guest_name'];
+                $guestName = trim($validated['guest_name']);
                 $guestPhone = $validated['guest_phone'] ?? null;
+            } else {
+                $orderUserId = $authUser->id;
+                $guestName = null;
+                $guestPhone = null;
             }
         }
 

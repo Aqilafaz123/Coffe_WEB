@@ -147,14 +147,28 @@ export default function CustomerSelect({ value, onChange }) {
             <input
               type="text"
               value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                setGuestName(name);
+                if (name.trim()) {
+                  onChange({ type: 'guest', name: name.trim(), phone: guestPhone.trim() || null });
+                } else {
+                  onChange(null);
+                }
+              }}
               placeholder="Nama pelanggan *"
               className="input-field text-sm"
             />
             <input
               type="text"
               value={guestPhone}
-              onChange={(e) => setGuestPhone(e.target.value)}
+              onChange={(e) => {
+                const phone = e.target.value;
+                setGuestPhone(phone);
+                if (guestName.trim()) {
+                  onChange({ type: 'guest', name: guestName.trim(), phone: phone.trim() || null });
+                }
+              }}
               placeholder="No. telepon (opsional)"
               className="input-field text-sm"
             />

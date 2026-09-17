@@ -22,11 +22,6 @@ export default function Cart() {
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
-    if (isStaff && !orderForUser) {
-      setError('Pilih atau isi nama pelanggan terlebih dahulu.');
-      return;
-    }
-
     if (!tableLocation.trim()) {
       setError('Isi nomor meja atau nama ruangan terlebih dahulu.');
       return;
@@ -47,11 +42,13 @@ export default function Cart() {
       };
 
       if (isStaff) {
-        if (orderForUser.type === 'user') {
+        if (orderForUser?.type === 'user' && orderForUser?.id) {
           payload.user_id = orderForUser.id;
+        } else if (orderForUser?.name?.trim()) {
+          payload.guest_name = orderForUser.name.trim();
+          if (orderForUser.phone?.trim()) payload.guest_phone = orderForUser.phone.trim();
         } else {
-          payload.guest_name = orderForUser.name;
-          if (orderForUser.phone) payload.guest_phone = orderForUser.phone;
+          payload.guest_name = 'Pelanggan Walk-in';
         }
       }
 
