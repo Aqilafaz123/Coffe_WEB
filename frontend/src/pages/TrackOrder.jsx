@@ -90,14 +90,7 @@ export default function TrackOrder() {
   useEffect(() => {
     fetchNowServing();
     fetchActiveOrders();
-
-    const interval = setInterval(() => {
-      fetchNowServing();
-      if (user) fetchActiveOrders();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [fetchNowServing, fetchActiveOrders, user]);
+  }, [fetchNowServing, fetchActiveOrders]);
 
   useEffect(() => {
     if (initialQuery) {
@@ -142,11 +135,11 @@ export default function TrackOrder() {
                 </div>
                 <button
                   onClick={() => { fetchNowServing(); if (user) fetchActiveOrders(); }}
-                  className="flex items-center gap-1.5 text-xs text-gold hover:text-white transition-colors"
-                  title="Perbarui"
+                  className="flex items-center gap-1.5 text-xs text-gold hover:text-white transition-colors px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 active:scale-95"
+                  title="Segarkan Data"
                 >
-                  <RefreshCw size={13} className="animate-spin-hover" />
-                  <span className="hidden sm:inline">Auto-refresh (5 dtk)</span>
+                  <RefreshCw size={13} className="hover:rotate-180 transition-transform duration-300" />
+                  <span>Segarkan</span>
                 </button>
               </div>
 

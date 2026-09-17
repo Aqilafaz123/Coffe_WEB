@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { Coffee, Clock, CheckCircle, ChevronLeft, RefreshCw } from 'lucide-react';
 import api from '../lib/api';
 
-const POLL_INTERVAL = 5000; // 5 seconds
 
 export default function QueueStatus() {
   const { orderId } = useParams();
@@ -30,8 +29,6 @@ export default function QueueStatus() {
 
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, POLL_INTERVAL);
-    return () => clearInterval(interval);
   }, [fetchStatus]);
 
   // ── Derived state ─────────────────────────────────────
@@ -283,10 +280,17 @@ export default function QueueStatus() {
                 </div>
               </div>
 
-              {/* Auto-refresh notice */}
-              <p className="text-center text-xs mt-4" style={{ color: '#c4a07a' }}>
-                ↻ Otomatis diperbarui setiap 5 detik
-              </p>
+              {/* Manual Refresh Button */}
+              <button
+                type="button"
+                onClick={fetchStatus}
+                disabled={loading}
+                className="su3 w-full mt-4 py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer"
+                style={{ background: '#2c1810', color: '#faf8f5' }}
+              >
+                <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+                {loading ? 'Memuat data...' : 'Segarkan Status Antrian'}
+              </button>
             </>
           )}
         </div>

@@ -37,8 +37,6 @@ function QueuePanel({ onOrdersRefresh }) {
 
   useEffect(() => {
     fetchQueue();
-    const interval = setInterval(fetchQueue, 5000);
-    return () => clearInterval(interval);
   }, [fetchQueue]);
 
   const callNext = async () => {
@@ -90,6 +88,15 @@ function QueuePanel({ onOrdersRefresh }) {
         style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
         {queueData.orders?.filter(o => !o.is_called).length ?? 0} menunggu
       </div>
+
+      {/* Manual refresh button */}
+      <button
+        onClick={fetchQueue}
+        title="Segarkan Antrian"
+        className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all active:scale-95"
+      >
+        <RotateCcw size={16} />
+      </button>
 
       {/* Call next button */}
       <button
