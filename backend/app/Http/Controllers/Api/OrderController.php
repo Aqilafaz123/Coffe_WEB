@@ -48,7 +48,7 @@ class OrderController extends Controller
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string'],
-            'table_location' => ['required', 'string', 'max:100'],
+            'table_location' => ['nullable', 'string', 'max:100'],
             'discount' => ['nullable', 'numeric', 'min:0'],
         ];
 
@@ -115,7 +115,7 @@ class OrderController extends Controller
                 'user_id' => $orderUserId,
                 'guest_name' => $guestName,
                 'guest_phone' => $guestPhone,
-                'table_location' => $validated['table_location'],
+                'table_location' => $validated['table_location'] ?? null,
                 'status' => 'awaiting_payment',
                 'payment_status' => 'unpaid',
                 'subtotal' => $subtotal,

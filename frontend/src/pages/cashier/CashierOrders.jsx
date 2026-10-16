@@ -57,7 +57,7 @@ function QueuePanel({ onOrdersRefresh }) {
 
   return (
     <div className="rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"
-      style={{ background: 'linear-gradient(135deg, #2c1810 0%, #5c3a28 100%)', boxShadow: '0 8px 24px rgba(44,24,16,0.2)' }}>
+      style={{ background: 'linear-gradient(135deg, #081b56 0%, #193a8d 100%)', boxShadow: '0 8px 24px rgba(8,27,86,0.2)' }}>
 
       {/* Currently called */}
       <div className="flex items-center gap-4 flex-1">
@@ -172,9 +172,9 @@ export default function CashierOrders() {
                   {/* Queue number badge */}
                   {order.queue_number && (
                     <div className="w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0"
-                      style={{ background: '#f5f0eb', border: '1.5px solid #e8d5c4' }}>
-                      <span className="text-xs leading-none" style={{ color: '#c4a07a' }}>#</span>
-                      <span className="font-bold text-sm leading-tight" style={{ color: '#2c1810' }}>{order.queue_number}</span>
+                      style={{ background: '#eef3fb', border: '1.5px solid #cfe0fb' }}>
+                      <span className="text-xs leading-none" style={{ color: '#6893e4' }}>#</span>
+                      <span className="font-bold text-sm leading-tight" style={{ color: '#081b56' }}>{order.queue_number}</span>
                     </div>
                   )}
                   <div>

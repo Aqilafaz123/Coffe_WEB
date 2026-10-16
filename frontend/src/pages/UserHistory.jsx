@@ -28,7 +28,6 @@ const reservationStatus = {
 
 const tabs = [
   { id: 'pesanan', label: 'Pesanan Menu', icon: ShoppingBag },
-  { id: 'reservasi', label: 'Reservasi Ruangan', icon: DoorOpen },
 ];
 
 function formatDate(value) {
@@ -41,15 +40,12 @@ function formatDate(value) {
 export default function UserHistory() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const pathTab = location.pathname.includes('reservasi') ? 'reservasi' : 'pesanan';
-  const activeTab = searchParams.get('tab') === 'reservasi' || searchParams.get('tab') === 'pesanan'
-    ? searchParams.get('tab')
-    : pathTab;
+  const activeTab = 'pesanan';
 
   const [orders, setOrders] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  const [loadingReservations, setLoadingReservations] = useState(true);
+  const [loadingReservations, setLoadingReservations] = useState(false);
 
   const fetchOrders = () => {
     setLoadingOrders(true);
@@ -59,13 +55,10 @@ export default function UserHistory() {
   };
 
   const fetchReservations = () => {
-    setLoadingReservations(true);
-    api.get('/reservations')
-      .then((r) => setReservations(r.data))
-      .finally(() => setLoadingReservations(false));
+    // Disabled while room reservation is hidden
   };
 
-  useEffect(() => { fetchOrders(); fetchReservations(); }, []);
+  useEffect(() => { fetchOrders(); }, []);
 
   const setTab = (tab) => setSearchParams({ tab });
 
@@ -75,44 +68,46 @@ export default function UserHistory() {
     fetchReservations();
   };
 
-  const loading = activeTab === 'pesanan' ? loadingOrders : loadingReservations;
+  const loading = loadingOrders;
 
   return (
     <div className="min-h-screen bg-coffee-50">
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-2">Riwayat Saya</h1>
-          <p className="text-coffee-500 mb-8">Lihat semua pesanan menu dan reservasi ruangan Anda</p>
+          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-2">Riwayat Pesanan</h1>
+          <p className="text-coffee-500 mb-8">Lihat semua riwayat pesanan menu Anda</p>
 
-          <div className="flex gap-2 p-1 bg-white rounded-2xl shadow-sm mb-8">
-            {tabs.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setTab(id)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  activeTab === id
-                    ? 'bg-coffee-900 text-white shadow-sm'
-                    : 'text-coffee-600 hover:bg-coffee-50'
-                }`}
-              >
-                <Icon size={16} />
-                <span className="hidden sm:inline">{label}</span>
-                <span className="sm:hidden">{id === 'pesanan' ? 'Menu' : 'Ruangan'}</span>
-                {id === 'pesanan' && orders.length > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
-                    {orders.length}
-                  </span>
-                )}
-                {id === 'reservasi' && reservations.length > 0 && (
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
-                    {reservations.length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
+          {tabs.length > 1 && (
+            <div className="flex gap-2 p-1 bg-white rounded-2xl shadow-sm mb-8">
+              {tabs.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setTab(id)}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    activeTab === id
+                      ? 'bg-coffee-900 text-white shadow-sm'
+                      : 'text-coffee-600 hover:bg-coffee-50'
+                  }`}
+                >
+                  <Icon size={16} />
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{id === 'pesanan' ? 'Menu' : 'Ruangan'}</span>
+                  {id === 'pesanan' && orders.length > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
+                      {orders.length}
+                    </span>
+                  )}
+                  {id === 'reservasi' && reservations.length > 0 && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
+                      {reservations.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-20">

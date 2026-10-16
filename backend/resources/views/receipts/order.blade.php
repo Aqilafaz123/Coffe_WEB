@@ -5,15 +5,16 @@
     <title>Struk {{ $order->order_number }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #2c1810; padding: 24px; }
-        .header { text-align: center; border-bottom: 2px dashed #8b6914; padding-bottom: 16px; margin-bottom: 16px; }
-        .header h1 { font-size: 22px; letter-spacing: 2px; margin-bottom: 4px; }
-        .header p { font-size: 11px; color: #666; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #081b56; padding: 24px; }
+        .header { text-align: center; border-bottom: 2px dashed #c99826; padding-bottom: 16px; margin-bottom: 16px; }
+        .header h1 { font-size: 24px; letter-spacing: 3px; margin-bottom: 2px; color: #081b56; }
+        .header .sub { font-size: 10px; font-weight: bold; letter-spacing: 2px; color: #c99826; margin-bottom: 6px; }
+        .header p { font-size: 11px; color: #555; }
         .meta { margin-bottom: 16px; }
         .meta table { width: 100%; }
         .meta td { padding: 3px 0; vertical-align: top; }
         .meta td:first-child { width: 110px; color: #666; }
-        .location { background: #f5f0eb; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-weight: bold; }
+        .location { background: #eef3fb; padding: 8px 12px; border-radius: 6px; margin-bottom: 16px; font-weight: bold; color: #081b56; }
         table.items { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
         table.items th { text-align: left; border-bottom: 1px solid #ccc; padding: 6px 4px; font-size: 11px; color: #666; }
         table.items td { padding: 6px 4px; border-bottom: 1px dotted #ddd; }
@@ -21,16 +22,17 @@
         .totals { margin-top: 8px; }
         .totals table { width: 100%; }
         .totals td { padding: 4px 0; }
-        .totals .grand td { font-weight: bold; font-size: 14px; border-top: 2px solid #2c1810; padding-top: 8px; }
+        .totals .grand td { font-weight: bold; font-size: 14px; border-top: 2px solid #081b56; padding-top: 8px; color: #081b56; }
         .totals .right { text-align: right; }
         .paid { text-align: center; margin: 20px 0; padding: 10px; border: 2px solid #16a34a; color: #16a34a; font-weight: bold; font-size: 14px; }
-        .footer { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 2px dashed #8b6914; font-size: 11px; color: #666; }
+        .footer { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 2px dashed #c99826; font-size: 11px; color: #666; }
         .notes { margin-top: 12px; font-size: 11px; color: #555; white-space: pre-line; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>COFFEE SHOP</h1>
+        <h1>RAHARDJA</h1>
+        <p class="sub">ES KRIM, TEH &amp; KOPI</p>
         <p>Jl. Kopi Nusantara No. 123 · Jakarta</p>
         <p>Telp: (021) 1234-5678</p>
     </div>
@@ -39,7 +41,7 @@
         <table>
             <tr><td>No. Pesanan</td><td><strong>{{ $order->order_number }}</strong></td></tr>
             @if($order->queue_number)
-            <tr><td>No. Antrian</td><td><strong style="font-size: 15px; color: #8b6914;">#{{ str_pad($order->queue_number, 3, '0', STR_PAD_LEFT) }}</strong></td></tr>
+            <tr><td>No. Antrian</td><td><strong style="font-size: 15px; color: #c99826;">#{{ str_pad($order->queue_number, 3, '0', STR_PAD_LEFT) }}</strong></td></tr>
             @endif
             <tr><td>Tanggal</td><td>{{ $order->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</td></tr>
             <tr><td>Pelanggan</td><td>{{ $order->customer_name }}</td></tr>

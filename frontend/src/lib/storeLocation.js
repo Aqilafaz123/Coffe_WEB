@@ -1,10 +1,10 @@
 export const GOOGLE_MAPS_URL = 'https://maps.app.goo.gl/NTHC6dzMzpMpjfaV8?g_st=ic';
 
 export const STORE = {
-  name: 'Coffee Shop',
+  name: 'Rahardja — Es Krim, Teh & Kopi',
   address: 'Lihat lokasi lengkap di Google Maps',
   phone: '(021) 1234-5678',
-  email: 'hello@coffee.shop',
+  email: 'hello@rahardja.com',
   hours: [
     { day: 'Senin – Jumat', time: '07:00 – 22:00' },
     { day: 'Sabtu – Minggu', time: '08:00 – 23:00' },

@@ -40,7 +40,21 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/10 gap-6">
-          <Link to="/" className="font-display text-3xl font-bold tracking-wider">COFFEE</Link>
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/logo-white.png"
+              alt="Rahardja"
+              className="h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="flex flex-col">
+              <span className="font-display text-2xl font-bold tracking-wider text-white leading-none">
+                RAHARDJA
+              </span>
+              <span className="text-[10px] tracking-widest text-gold uppercase font-medium mt-1">
+                Es Krim, Teh &amp; Kopi
+              </span>
+            </div>
+          </Link>
           <div className="flex items-center gap-4">
             {[Share2, Globe, MessageCircle, Mail].map((Icon, i) => (
               <a key={i} href="#" className="text-white/50 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full">
@@ -48,7 +62,7 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <p className="text-white/40 text-sm">&copy; {new Date().getFullYear()} Coffee Shop. All rights reserved.</p>
+          <p className="text-white/40 text-sm">&copy; {new Date().getFullYear()} Rahardja. All rights reserved.</p>
         </div>
       </div>
     </footer>

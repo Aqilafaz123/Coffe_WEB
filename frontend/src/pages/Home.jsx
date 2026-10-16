@@ -59,12 +59,17 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-coffee-950/90 via-coffee-900/70 to-transparent" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20">
           <div className="max-w-xl animate-fade-up">
-            <p className="text-gold text-sm font-medium tracking-widest uppercase mb-4">Premium Coffee Experience</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-8 h-0.5 bg-gold" />
+              <p className="text-gold text-xs md:text-sm font-semibold tracking-widest uppercase">
+                Rahardja • Es Krim, Teh &amp; Kopi
+              </p>
+            </div>
             <h1 className="font-display text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-              Kopi Terbaik<br />di Kota Ini!
+              Cita Rasa Istimewa<br />di Setiap Momen!
             </h1>
-            <p className="text-white/70 text-lg mb-8 leading-relaxed">
-              Nikmati cita rasa kopi premium yang diseduh dengan penuh passion oleh barista profesional kami.
+            <p className="text-white/80 text-base md:text-lg mb-8 leading-relaxed">
+              Nikmati kelembutan es krim premium, seduhan teh pilihan beraroma segar, dan racikan kopi berkualitas tinggi dari Rahardja.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <Link to="/shop" className="inline-flex items-center gap-2 bg-white text-coffee-900 px-8 py-4 rounded-full font-semibold hover:bg-coffee-100 transition-all hover:shadow-xl hover:shadow-black/20 active:scale-95">

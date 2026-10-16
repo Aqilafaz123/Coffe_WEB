@@ -9,7 +9,6 @@ const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/shop', label: 'Shop' },
   { to: '/pantau-pesanan', label: 'Pantau Pesanan', isSpecial: true },
-  { to: '/reservasi', label: 'Reservasi' },
   { to: '/shop?category=hot-coffee', label: 'Coffee' },
   { to: '/shop?category=dessert', label: 'Bakery' },
   { to: '/lokasi', label: 'Location' },
@@ -79,8 +78,20 @@ export default function Navbar() {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isHome ? 'glass-nav' : 'bg-coffee-900 shadow-lg'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="font-display text-2xl md:text-3xl font-bold text-white tracking-wider">
-            COFFEE
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/logo-white.png"
+              alt="Rahardja"
+              className="h-9 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="flex flex-col">
+              <span className="font-display text-xl md:text-2xl font-bold text-white tracking-wider leading-none">
+                RAHARDJA
+              </span>
+              <span className="text-[9px] md:text-[10px] tracking-widest text-gold uppercase font-medium mt-0.5">
+                Es Krim, Teh &amp; Kopi
+              </span>
+            </div>
           </Link>
 
           <div className="hidden md:flex items-center gap-6 lg:gap-8">

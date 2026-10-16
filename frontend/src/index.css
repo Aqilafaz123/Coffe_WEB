@@ -4,19 +4,19 @@
 @theme {
   --font-display: 'Playfair Display', serif;
   --font-body: 'Outfit', sans-serif;
-  --color-coffee-950: #1a0f0a;
-  --color-coffee-900: #2c1810;
-  --color-coffee-800: #3d2317;
-  --color-coffee-700: #5c3a28;
-  --color-coffee-600: #8b5e3c;
-  --color-coffee-500: #a67c52;
-  --color-coffee-400: #c4a07a;
-  --color-coffee-300: #d4b896;
-  --color-coffee-200: #e8d5c4;
-  --color-coffee-100: #f5f0eb;
-  --color-coffee-50: #faf8f5;
-  --color-cream: #faf6f1;
-  --color-gold: #c9a227;
+  --color-coffee-950: #040d28;
+  --color-coffee-900: #081b56;
+  --color-coffee-800: #0f276e;
+  --color-coffee-700: #193a8d;
+  --color-coffee-600: #224fa8;
+  --color-coffee-500: #3b6ece;
+  --color-coffee-400: #6893e4;
+  --color-coffee-300: #a3c2f4;
+  --color-coffee-200: #cfe0fb;
+  --color-coffee-100: #eaf1fd;
+  --color-coffee-50: #f4f7fc;
+  --color-cream: #f8fafd;
+  --color-gold: #c99826;
 }
 
 * {
@@ -53,7 +53,7 @@ body {
 }
 
 .glass-nav {
-  background: rgba(26, 15, 10, 0.75);
+  background: rgba(8, 27, 86, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
@@ -64,7 +64,7 @@ body {
 
 .card-hover:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(44, 24, 16, 0.12);
+  box-shadow: 0 20px 40px rgba(8, 27, 86, 0.12);
 }
 
 .btn-primary {

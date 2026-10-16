@@ -12,11 +12,9 @@ const adminLinks = [
   { to: '/admin/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
   { to: '/admin/products', icon: Package, label: 'Produk' },
-  { to: '/admin/rooms', icon: DoorOpen, label: 'Ruangan' },
   { to: '/admin/vouchers', icon: Tag, label: 'Voucher' },
   { to: '/admin/users', icon: Users, label: 'Pengguna' },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Pesanan' },
-  { to: '/admin/reservasi', icon: CalendarDays, label: 'Reservasi' },
 ];
 
 const cashierLinks = [
@@ -24,7 +22,6 @@ const cashierLinks = [
   { to: '/kasir/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
   { to: '/kasir/orders', icon: ShoppingCart, label: 'Pesanan' },
-  { to: '/kasir/reservasi', icon: CalendarDays, label: 'Reservasi' },
 ];
 
 export default function DashboardLayout({ children, title, role }) {
@@ -42,11 +39,18 @@ export default function DashboardLayout({ children, title, role }) {
     <div className="min-h-screen bg-coffee-50 flex">
       <aside className="w-64 bg-coffee-900 text-white flex flex-col fixed h-full">
         <div className="p-6 border-b border-white/10">
-          <Link to="/" className="flex items-center gap-3">
-            <Coffee className="text-gold" size={28} />
-            <span className="font-display text-xl font-bold">COFFEE</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <img
+              src="/logo-white.png"
+              alt="Rahardja"
+              className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="flex flex-col">
+              <span className="font-display text-lg font-bold text-white tracking-wider leading-none">RAHARDJA</span>
+              <span className="text-[9px] tracking-widest text-gold uppercase font-medium mt-0.5">Es Krim, Teh &amp; Kopi</span>
+            </div>
           </Link>
-          <p className="text-white/50 text-xs mt-2 capitalize">{role === 'superadmin' ? 'Super Admin' : 'Kasir'}</p>
+          <p className="text-white/50 text-xs mt-2.5 capitalize">{role === 'superadmin' ? 'Super Admin' : 'Kasir'}</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">

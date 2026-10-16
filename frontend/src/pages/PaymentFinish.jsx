@@ -51,8 +51,8 @@ export default function PaymentFinish() {
               {order && (
                 <Link
                   to={`/antrian/${order.id}`}
-                  className="flex items-center justify-center gap-2 w-full max-w-xs mx-auto mb-4 py-3.5 px-6 rounded-2xl font-semibold text-sm transition-all hover:opacity-90 active:scale-95"
-                  style={{ background: 'linear-gradient(135deg, #2c1810 0%, #5c3a28 100%)', color: '#faf8f5', boxShadow: '0 6px 20px rgba(44,24,16,0.2)' }}
+                  className="flex items-center justify-center gap-2 w-full max-w-xs mx-auto mb-4 py-3.5 px-6 rounded-2xl font-semibold text-sm transition-all hover:opacity-90 active:scale-95 text-white"
+                  style={{ background: 'linear-gradient(135deg, #081b56 0%, #193a8d 100%)', boxShadow: '0 6px 20px rgba(8,27,86,0.2)' }}
                 >
                   🎫 Pantau Nomor Antrian
                 </Link>

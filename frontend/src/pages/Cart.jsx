@@ -22,11 +22,6 @@ export default function Cart() {
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
-    if (!tableLocation.trim()) {
-      setError('Isi nomor meja atau nama ruangan terlebih dahulu.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     try {
@@ -38,7 +33,7 @@ export default function Cart() {
       const payload = {
         items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
         notes: itemNotes || null,
-        table_location: tableLocation.trim(),
+        table_location: tableLocation?.trim() || null,
       };
 
       if (isStaff) {
@@ -129,22 +124,6 @@ export default function Cart() {
 
                 <div className={`p-5 space-y-5 ${isStaff ? 'border-t border-coffee-100' : ''}`}>
                   <div>
-                    <p className="text-sm font-medium text-coffee-800 mb-2">Lokasi Pengantaran</p>
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-coffee-200 bg-coffee-50 focus-within:ring-2 focus-within:ring-coffee-400 focus-within:border-transparent transition-all">
-                      <MapPin size={18} className="shrink-0 text-coffee-400" />
-                      <input
-                        type="text"
-                        value={tableLocation}
-                        onChange={(e) => setTableLocation(e.target.value)}
-                        placeholder="Meja 5, Ruang VIP A"
-                        className="flex-1 min-w-0 bg-transparent text-sm text-coffee-900 placeholder:text-coffee-400 focus:outline-none"
-                        required
-                      />
-                    </div>
-                    <p className="text-xs text-coffee-400 mt-2">Pelayan mengantar ke meja/ruangan ini</p>
-                  </div>
-
-                  <div className="pt-4 border-t border-coffee-100">
                     <p className="text-sm font-medium text-coffee-800 mb-3">Ringkasan Pesanan</p>
                     <div className="flex justify-between text-sm text-coffee-600 mb-2">
                       <span>Subtotal</span>

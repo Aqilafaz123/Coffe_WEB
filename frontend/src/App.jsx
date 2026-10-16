@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -35,7 +35,7 @@ export default function App() {
             <Route path="/shop" element={<Shop />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/reservasi" element={<Reservasi />} />
+            <Route path="/reservasi" element={<Navigate to="/" replace />} />
             <Route path="/lokasi" element={<Location />} />
             <Route path="/pantau-pesanan" element={<TrackOrder />} />
             <Route path="/pantau" element={<TrackOrder />} />
