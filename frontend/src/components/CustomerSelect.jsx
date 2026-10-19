@@ -81,11 +81,10 @@ export default function CustomerSelect({ value, onChange }) {
             key={m.id}
             type="button"
             onClick={() => switchMode(m.id)}
-            className={`flex-1 py-2.5 px-1 text-center text-xs sm:text-sm font-medium rounded-lg transition-all ${
-              mode === m.id
+            className={`flex-1 py-2.5 px-1 text-center text-xs sm:text-sm font-medium rounded-lg transition-all ${mode === m.id
                 ? 'bg-white text-coffee-900 shadow-sm'
                 : 'text-coffee-600 hover:text-coffee-800'
-            }`}
+              }`}
           >
             {m.label}
           </button>
@@ -147,28 +146,14 @@ export default function CustomerSelect({ value, onChange }) {
             <input
               type="text"
               value={guestName}
-              onChange={(e) => {
-                const name = e.target.value;
-                setGuestName(name);
-                if (name.trim()) {
-                  onChange({ type: 'guest', name: name.trim(), phone: guestPhone.trim() || null });
-                } else {
-                  onChange(null);
-                }
-              }}
+              onChange={(e) => setGuestName(e.target.value)}
               placeholder="Nama pelanggan *"
               className="input-field text-sm"
             />
             <input
               type="text"
               value={guestPhone}
-              onChange={(e) => {
-                const phone = e.target.value;
-                setGuestPhone(phone);
-                if (guestName.trim()) {
-                  onChange({ type: 'guest', name: guestName.trim(), phone: phone.trim() || null });
-                }
-              }}
+              onChange={(e) => setGuestPhone(e.target.value)}
               placeholder="No. telepon (opsional)"
               className="input-field text-sm"
             />
