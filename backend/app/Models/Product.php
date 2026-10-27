@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     protected $fillable = [
-        'category_id', 'name', 'slug', 'description', 'price',
+        'category_id', 'name', 'slug', 'description', 'price', 'cost_price',
         'image', 'is_featured', 'is_active', 'stock',
     ];
 
@@ -18,9 +18,26 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
+            'cost_price' => 'decimal:2',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function calculateUnitCost(): float
+    {
+        $this->loadMissing('ingredients');
+        $recipeCost = (float) $this->ingredients->sum(function ($ing) {
+            $qty = (float) ($ing->pivot->quantity_required ?? 0);
+            $cost = (float) ($ing->cost_per_unit ?? 0);
+            return $qty * $cost;
+        });
+
+        if ($recipeCost > 0) {
+            return $recipeCost;
+        }
+
+        return (float) ($this->cost_price ?? 0);
     }
 
     public function category(): BelongsTo

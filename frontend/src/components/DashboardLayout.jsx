@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays, Boxes, ScrollText, History } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays, Boxes, ScrollText, History, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const sharedOrderLinks = [
@@ -9,6 +9,7 @@ const sharedOrderLinks = [
 
 const adminLinks = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/pnl', icon: TrendingUp, label: 'Laba Rugi (P&L)' },
   { to: '/admin/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
   { to: '/admin/products', icon: Package, label: 'Produk' },

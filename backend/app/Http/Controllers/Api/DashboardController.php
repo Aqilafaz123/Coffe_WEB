@@ -51,6 +51,28 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $monthlyOrders = Order::with('items.product.ingredients')
+            ->where('status', 'completed')
+            ->whereMonth('completed_at', now()->month)
+            ->whereYear('completed_at', now()->year)
+            ->get();
+
+        $monthlyCogs = 0.0;
+        foreach ($monthlyOrders as $order) {
+            foreach ($order->items as $item) {
+                $cost = (float) $item->cost_price > 0 ? (float) $item->cost_price : ($item->product ? $item->product->calculateUnitCost() : 0);
+                $monthlyCogs += $cost * (int) $item->quantity;
+            }
+        }
+
+        $monthlyExpenses = (float) \App\Models\Expense::whereMonth('expense_date', now()->month)
+            ->whereYear('expense_date', now()->year)
+            ->sum('amount');
+
+        $monthlyGrossProfit = $monthlyRevenue - $monthlyCogs;
+        $monthlyNetProfit = $monthlyGrossProfit - $monthlyExpenses;
+        $monthlyNetMargin = $monthlyRevenue > 0 ? round(($monthlyNetProfit / $monthlyRevenue) * 100, 1) : 0;
+
         return response()->json([
             'total_users' => User::where('role', 'user')->count(),
             'total_products' => Product::count(),
@@ -58,6 +80,11 @@ class DashboardController extends Controller
             'pending_orders' => Order::where('status', 'pending')->count(),
             'total_revenue' => $totalRevenue,
             'monthly_revenue' => $monthlyRevenue,
+            'monthly_cogs' => round($monthlyCogs, 2),
+            'monthly_gross_profit' => round($monthlyGrossProfit, 2),
+            'monthly_expenses' => round($monthlyExpenses, 2),
+            'monthly_net_profit' => round($monthlyNetProfit, 2),
+            'monthly_net_margin' => $monthlyNetMargin,
             'sales_by_day' => $salesByDay,
             'top_products' => $topProducts,
         ]);

@@ -87,3 +87,17 @@ body {
 .section-title {
   @apply font-display text-3xl md:text-4xl font-bold text-coffee-900 text-center;
 }
+
+@media print {
+  aside, header, nav, button, .no-print {
+    display: none !important;
+  }
+  main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

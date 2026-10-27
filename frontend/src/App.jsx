@@ -11,6 +11,7 @@ import UserHistory from './pages/UserHistory';
 import CashierDashboard from './pages/cashier/CashierDashboard';
 import CashierOrders from './pages/cashier/CashierOrders';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminPnL from './pages/admin/AdminPnL';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -99,6 +100,11 @@ export default function App() {
             <Route path="/admin" element={
               <ProtectedRoute roles={['superadmin']}>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/pnl" element={
+              <ProtectedRoute roles={['superadmin']}>
+                <AdminPnL />
               </ProtectedRoute>
             } />
             <Route path="/admin/products" element={

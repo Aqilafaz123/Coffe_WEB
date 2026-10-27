@@ -3,9 +3,11 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\IngredientController;
 use App\Http\Controllers\Api\MidtransController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PnLController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\QueueController;
 use App\Http\Controllers\Api\RoomController;
@@ -115,5 +117,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/rooms', [RoomController::class, 'store']);
         Route::put('/rooms/{room}', [RoomController::class, 'update']);
         Route::delete('/rooms/{room}', [RoomController::class, 'destroy']);
+
+        // Profit and Loss (PnL) & Expenses
+        Route::get('/pnl', [PnLController::class, 'report']);
+        Route::get('/expenses', [ExpenseController::class, 'index']);
+        Route::post('/expenses', [ExpenseController::class, 'store']);
+        Route::get('/expenses/categories', [ExpenseController::class, 'categories']);
+        Route::get('/expenses/{expense}', [ExpenseController::class, 'show']);
+        Route::put('/expenses/{expense}', [ExpenseController::class, 'update']);
+        Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy']);
     });
 });
