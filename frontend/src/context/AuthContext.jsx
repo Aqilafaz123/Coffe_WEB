@@ -60,6 +60,7 @@ export function AuthProvider({ children }) {
     switch (role) {
       case 'superadmin': return '/admin';
       case 'cashier': return '/kasir';
+      case 'logistics': return '/logistik';
       default: return '/riwayat';
     }
   };

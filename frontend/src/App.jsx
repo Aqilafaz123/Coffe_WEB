@@ -24,6 +24,10 @@ import AdminRooms from './pages/admin/AdminRooms';
 import StaffReservations from './pages/staff/StaffReservations';
 import QueueStatus from './pages/QueueStatus';
 import TrackOrder from './pages/TrackOrder';
+import LogisticsDashboard from './pages/logistics/LogisticsDashboard';
+import LogisticsIngredients from './pages/logistics/LogisticsIngredients';
+import LogisticsRecipes from './pages/logistics/LogisticsRecipes';
+import LogisticsMutations from './pages/logistics/LogisticsMutations';
 
 export default function App() {
   return (
@@ -130,6 +134,45 @@ export default function App() {
             <Route path="/admin/reservasi" element={
               <ProtectedRoute roles={['superadmin']}>
                 <StaffReservations role="superadmin" />
+              </ProtectedRoute>
+            } />
+
+            {/* Logistics Routes */}
+            <Route path="/logistik" element={
+              <ProtectedRoute roles={['logistics', 'superadmin']}>
+                <LogisticsDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/logistik/bahan" element={
+              <ProtectedRoute roles={['logistics', 'superadmin']}>
+                <LogisticsIngredients />
+              </ProtectedRoute>
+            } />
+            <Route path="/logistik/resep" element={
+              <ProtectedRoute roles={['logistics', 'superadmin']}>
+                <LogisticsRecipes />
+              </ProtectedRoute>
+            } />
+            <Route path="/logistik/mutasi" element={
+              <ProtectedRoute roles={['logistics', 'superadmin']}>
+                <LogisticsMutations />
+              </ProtectedRoute>
+            } />
+
+            {/* Admin Aliases for Logistics Features */}
+            <Route path="/admin/bahan" element={
+              <ProtectedRoute roles={['superadmin']}>
+                <LogisticsIngredients />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/resep" element={
+              <ProtectedRoute roles={['superadmin']}>
+                <LogisticsRecipes />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/mutasi" element={
+              <ProtectedRoute roles={['superadmin']}>
+                <LogisticsMutations />
               </ProtectedRoute>
             } />
           </Routes>

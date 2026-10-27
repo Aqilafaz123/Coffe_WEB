@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays, Boxes, ScrollText, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const sharedOrderLinks = [
@@ -12,6 +12,8 @@ const adminLinks = [
   { to: '/admin/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
   { to: '/admin/products', icon: Package, label: 'Produk' },
+  { to: '/admin/bahan', icon: Boxes, label: 'Bahan Baku' },
+  { to: '/admin/resep', icon: ScrollText, label: 'Resep Produk' },
   { to: '/admin/vouchers', icon: Tag, label: 'Voucher' },
   { to: '/admin/users', icon: Users, label: 'Pengguna' },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Pesanan' },
@@ -24,11 +26,19 @@ const cashierLinks = [
   { to: '/kasir/orders', icon: ShoppingCart, label: 'Pesanan' },
 ];
 
+const logisticsLinks = [
+  { to: '/logistik', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/logistik/bahan', icon: Boxes, label: 'Bahan Baku (Stok)' },
+  { to: '/logistik/resep', icon: ScrollText, label: 'Resep Produk (BOM)' },
+  { to: '/logistik/mutasi', icon: History, label: 'Riwayat Mutasi' },
+];
+
 export default function DashboardLayout({ children, title, role }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const links = role === 'superadmin' ? adminLinks : cashierLinks;
+  const links = role === 'superadmin' ? adminLinks : role === 'logistics' ? logisticsLinks : cashierLinks;
+  const roleName = role === 'superadmin' ? 'Super Admin' : role === 'logistics' ? 'Staff Logistik' : 'Kasir';
 
   const handleLogout = async () => {
     await logout();
@@ -50,7 +60,7 @@ export default function DashboardLayout({ children, title, role }) {
               <span className="text-[9px] tracking-widest text-gold uppercase font-medium mt-0.5">Es Krim, Teh &amp; Kopi</span>
             </div>
           </Link>
-          <p className="text-white/50 text-xs mt-2.5 capitalize">{role === 'superadmin' ? 'Super Admin' : 'Kasir'}</p>
+          <p className="text-white/50 text-xs mt-2.5 capitalize">{roleName}</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">

@@ -7,6 +7,7 @@ import { loadMidtransSnap } from '../lib/midtrans';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import DownloadReceiptButton from '../components/DownloadReceiptButton';
+import DownloadCashierTicketButton from '../components/DownloadCashierTicketButton';
 
 export default function Payment() {
   const { orderId } = useParams();
@@ -194,6 +195,9 @@ export default function Payment() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                 {order && (
                   <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
+                )}
+                {order && isStaff && (
+                  <DownloadCashierTicketButton orderId={order.id} orderNumber={order.order_number} />
                 )}
                 <button onClick={() => navigate(donePath)} className="btn-primary">Lihat Pesanan</button>
               </div>

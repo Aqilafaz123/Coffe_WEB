@@ -6,6 +6,7 @@ import { PAYMENT_LABELS } from '../../lib/paymentMethods';
 import { getOrderCustomerLabel, isWalkInOrder } from '../../lib/orderHelpers';
 import DashboardLayout from '../../components/DashboardLayout';
 import DownloadReceiptButton from '../../components/DownloadReceiptButton';
+import DownloadCashierTicketButton from '../../components/DownloadCashierTicketButton';
 
 const statuses = ['awaiting_payment', 'pending', 'preparing', 'completed', 'cancelled'];
 const statusLabels = { awaiting_payment: 'Belum Bayar', pending: 'Pending', preparing: 'Disiapkan', completed: 'Selesai', cancelled: 'Batal' };
@@ -218,7 +219,10 @@ export default function CashierOrders() {
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
                   {order.payment_status === 'paid' && (
-                    <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} className="!py-1.5 !px-3 !text-xs" />
+                    <>
+                      <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} className="!py-1.5 !px-3 !text-xs" />
+                      <DownloadCashierTicketButton orderId={order.id} orderNumber={order.order_number} className="!py-1.5 !px-3 !text-xs" />
+                    </>
                   )}
                   {order.status === 'awaiting_payment' && (
                     <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 bg-orange-600 text-white text-sm rounded-full hover:bg-orange-700">

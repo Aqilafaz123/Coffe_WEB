@@ -66,3 +66,25 @@ export async function downloadOrderReceipt(orderId, orderNumber) {
   link.remove();
   window.URL.revokeObjectURL(url);
 }
+
+export async function downloadCashierReceipt(orderId, orderNumber) {
+  const response = await api.get(`/orders/${orderId}/cashier-receipt`, {
+    responseType: 'blob',
+    headers: { Accept: 'application/pdf' },
+  });
+
+  const blob = response.data;
+
+  if (blob.type?.includes('json')) {
+    throw new Error(await parseBlobError(blob));
+  }
+
+  const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `tiket-kasir-${orderNumber}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+}

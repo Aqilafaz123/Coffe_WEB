@@ -3,8 +3,8 @@ import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import api from '../../lib/api';
 import DashboardLayout from '../../components/DashboardLayout';
 
-const roleLabels = { user: 'User', cashier: 'Kasir', superadmin: 'Super Admin' };
-const roleColors = { user: 'bg-blue-100 text-blue-800', cashier: 'bg-purple-100 text-purple-800', superadmin: 'bg-red-100 text-red-800' };
+const roleLabels = { user: 'User', cashier: 'Kasir', superadmin: 'Super Admin', logistics: 'Logistik' };
+const roleColors = { user: 'bg-blue-100 text-blue-800', cashier: 'bg-purple-100 text-purple-800', superadmin: 'bg-red-100 text-red-800', logistics: 'bg-amber-100 text-amber-800' };
 const emptyForm = { name: '', email: '', password: '', role: 'user', phone: '' };
 
 export default function AdminUsers() {
@@ -111,6 +111,7 @@ export default function AdminUsers() {
               <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="input-field">
                 <option value="user">User</option>
                 <option value="cashier">Kasir</option>
+                <option value="logistics">Staff Logistik</option>
                 <option value="superadmin">Super Admin</option>
               </select>
               <input placeholder="Telepon" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input-field" />

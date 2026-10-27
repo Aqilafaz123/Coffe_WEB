@@ -296,6 +296,7 @@ export default function Login() {
                 {[
                   { role: 'Admin', email: 'admin@coffee.shop', color: '#ef4444' },
                   { role: 'Kasir', email: 'kasir@coffee.shop', color: '#f97316' },
+                  { role: 'Logistik', email: 'logistik@coffee.shop', color: '#d97706' },
                   { role: 'User',  email: 'user@coffee.shop',  color: '#22c55e' },
                 ].map(({ role, email: demoEmail, color }) => (
                   <button

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\IngredientController;
 use App\Http\Controllers\Api\MidtransController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
@@ -41,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt']);
+    Route::get('/orders/{order}/cashier-receipt', [OrderController::class, 'cashierReceipt']);
     Route::post('/orders/{order}/pay', [OrderController::class, 'processPayment']);
     Route::post('/orders/{order}/snap-token', [MidtransController::class, 'snapToken']);
     Route::post('/orders/{order}/verify-payment', [MidtransController::class, 'verifyPayment']);
@@ -67,6 +69,19 @@ Route::middleware('auth:sanctum')->group(function () {
         // Queue — cashier actions
         Route::get('/queue/current', [QueueController::class, 'current']);
         Route::patch('/queue/call', [QueueController::class, 'call']);
+    });
+
+    Route::middleware('role:logistics,superadmin')->group(function () {
+        Route::get('/ingredients/stats', [IngredientController::class, 'stats']);
+        Route::get('/ingredients/mutations', [IngredientController::class, 'mutations']);
+        Route::get('/ingredients/recipes', [IngredientController::class, 'productsWithRecipes']);
+        Route::get('/ingredients', [IngredientController::class, 'index']);
+        Route::post('/ingredients', [IngredientController::class, 'store']);
+        Route::get('/ingredients/{ingredient}', [IngredientController::class, 'show']);
+        Route::put('/ingredients/{ingredient}', [IngredientController::class, 'update']);
+        Route::post('/ingredients/{ingredient}/restock', [IngredientController::class, 'restock']);
+        Route::delete('/ingredients/{ingredient}', [IngredientController::class, 'destroy']);
+        Route::post('/products/{product}/recipe', [IngredientController::class, 'saveRecipe']);
     });
 
     Route::middleware('role:superadmin')->group(function () {

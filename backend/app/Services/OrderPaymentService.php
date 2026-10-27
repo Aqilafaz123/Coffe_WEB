@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Ingredient;
+use App\Models\IngredientMutation;
 use App\Models\Order;
 use App\Models\Voucher;
 use Illuminate\Support\Facades\DB;
@@ -44,8 +46,85 @@ class OrderPaymentService
                 'midtrans_transaction_id' => $transactionId ?? $order->midtrans_transaction_id,
             ]);
 
+            // Deduct ingredients automatically
+            $this->deductOrderIngredients($order);
+
             return $order->load(['user', 'items.product']);
         });
+    }
+
+    public function deductOrderIngredients(Order $order): void
+    {
+        $order->loadMissing('items.product.ingredients');
+
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            if (! $product) {
+                continue;
+            }
+
+            foreach ($product->ingredients as $ingredient) {
+                $quantityRequired = (float) ($ingredient->pivot->quantity_required ?? 0);
+                $totalDeduction = $quantityRequired * $item->quantity;
+
+                if ($totalDeduction <= 0) {
+                    continue;
+                }
+
+                $previousStock = (float) $ingredient->stock;
+                $currentStock = max(0, $previousStock - $totalDeduction);
+
+                $ingredient->update(['stock' => $currentStock]);
+
+                IngredientMutation::create([
+                    'ingredient_id' => $ingredient->id,
+                    'type' => 'out',
+                    'quantity' => $totalDeduction,
+                    'previous_stock' => $previousStock,
+                    'current_stock' => $currentStock,
+                    'reference_id' => (string) $order->id,
+                    'notes' => "Pesanan #{$order->order_number} ({$product->name} x{$item->quantity})",
+                    'user_id' => auth()->id() ?? $order->user_id,
+                ]);
+            }
+        }
+    }
+
+    public function restoreOrderIngredients(Order $order): void
+    {
+        $order->loadMissing('items.product.ingredients');
+
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            if (! $product) {
+                continue;
+            }
+
+            foreach ($product->ingredients as $ingredient) {
+                $quantityRequired = (float) ($ingredient->pivot->quantity_required ?? 0);
+                $totalRestore = $quantityRequired * $item->quantity;
+
+                if ($totalRestore <= 0) {
+                    continue;
+                }
+
+                $previousStock = (float) $ingredient->stock;
+                $currentStock = $previousStock + $totalRestore;
+
+                $ingredient->update(['stock' => $currentStock]);
+
+                IngredientMutation::create([
+                    'ingredient_id' => $ingredient->id,
+                    'type' => 'in',
+                    'quantity' => $totalRestore,
+                    'previous_stock' => $previousStock,
+                    'current_stock' => $currentStock,
+                    'reference_id' => (string) $order->id,
+                    'notes' => "Pengembalian Pesanan Batal #{$order->order_number} ({$product->name} x{$item->quantity})",
+                    'user_id' => auth()->id() ?? $order->user_id,
+                ]);
+            }
+        }
     }
 
     public function mapMidtransPaymentType(?string $paymentType): string

@@ -128,5 +128,7 @@ class DatabaseSeeder extends Seeder
                 'slug' => Str::slug($room['name']).'-'.Str::random(4),
             ]);
         }
+
+        $this->call(LogisticsSeeder::class);
     }
 }

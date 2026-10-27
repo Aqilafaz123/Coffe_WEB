@@ -174,6 +174,62 @@ class OrderController extends Controller
         return $pdf->download($filename);
     }
 
+    public function cashierReceipt(Request $request, Order $order): Response|JsonResponse
+    {
+        $user = $request->user();
+        if (! $user->isSuperadmin() && ! $user->isCashier() && ! $user->isLogistics()) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $order->load(['user', 'items.product.ingredients', 'processor']);
+
+        $paymentLabels = [
+            'qris' => 'QRIS',
+            'gopay' => 'GoPay',
+            'ovo' => 'OVO',
+            'dana' => 'DANA',
+            'bank_transfer' => 'Transfer Bank',
+            'card' => 'Kartu Debit/Kredit',
+            'cash' => 'Tunai',
+        ];
+
+        // Aggregate all ingredients used in this order
+        $inventoryBreakdown = [];
+        foreach ($order->items as $item) {
+            if (! $item->product) {
+                continue;
+            }
+            foreach ($item->product->ingredients as $ingredient) {
+                $qtyRequired = (float) ($ingredient->pivot->quantity_required ?? 0);
+                $totalUsed = $qtyRequired * $item->quantity;
+                $ingId = $ingredient->id;
+
+                if (! isset($inventoryBreakdown[$ingId])) {
+                    $inventoryBreakdown[$ingId] = [
+                        'name' => $ingredient->name,
+                        'unit' => $ingredient->unit,
+                        'total_used' => 0,
+                        'current_stock' => (float) $ingredient->stock,
+                    ];
+                }
+                $inventoryBreakdown[$ingId]['total_used'] += $totalUsed;
+            }
+        }
+
+        $formatPrice = fn ($amount) => 'Rp '.number_format((float) $amount, 0, ',', '.');
+
+        $pdf = Pdf::loadView('receipts.cashier', [
+            'order' => $order,
+            'paymentLabel' => $paymentLabels[$order->payment_method] ?? $order->payment_method ?? '-',
+            'inventoryBreakdown' => array_values($inventoryBreakdown),
+            'formatPrice' => $formatPrice,
+        ])->setPaper([0, 0, 226.77, 841.89], 'portrait');
+
+        $filename = 'tiket-kasir-'.$order->order_number.'.pdf';
+
+        return $pdf->download($filename);
+    }
+
     public function processPayment(Request $request, Order $order, OrderPaymentService $paymentService): JsonResponse
     {
         if ($order->status !== 'awaiting_payment') {
@@ -228,7 +284,7 @@ class OrderController extends Controller
         return response()->json(['message' => 'Pesanan dibatalkan.']);
     }
 
-    public function updateStatus(Request $request, Order $order): JsonResponse
+    public function updateStatus(Request $request, Order $order, OrderPaymentService $paymentService): JsonResponse
     {
         $validated = $request->validate([
             'status' => ['required', 'in:pending,preparing,completed,cancelled'],
@@ -238,23 +294,34 @@ class OrderController extends Controller
             return response()->json(['message' => 'Pesanan harus dibayar terlebih dahulu.'], 422);
         }
 
-        $updateData = [
-            'status'       => $validated['status'],
-            'processed_by' => $request->user()->id,
-            'completed_at' => $validated['status'] === 'completed' ? now() : null,
-        ];
+        DB::transaction(function () use ($validated, $request, $order, $paymentService) {
+            if ($validated['status'] === 'cancelled' && $order->status !== 'cancelled') {
+                foreach ($order->items as $item) {
+                    Product::where('id', $item->product_id)->increment('stock', $item->quantity);
+                }
+                if ($order->payment_status === 'paid') {
+                    $paymentService->restoreOrderIngredients($order);
+                }
+            }
 
-        // Auto-assign daily queue number when order moves to 'pending'
-        if ($validated['status'] === 'pending' && is_null($order->queue_number)) {
-            $maxQueue = Order::whereDate('created_at', today())
-                ->whereNotNull('queue_number')
-                ->max('queue_number') ?? 0;
-            $updateData['queue_number'] = $maxQueue + 1;
-        }
+            $updateData = [
+                'status'       => $validated['status'],
+                'processed_by' => $request->user()->id,
+                'completed_at' => $validated['status'] === 'completed' ? now() : null,
+            ];
 
-        $order->update($updateData);
+            // Auto-assign daily queue number when order moves to 'pending'
+            if ($validated['status'] === 'pending' && is_null($order->queue_number)) {
+                $maxQueue = Order::whereDate('created_at', today())
+                    ->whereNotNull('queue_number')
+                    ->max('queue_number') ?? 0;
+                $updateData['queue_number'] = $maxQueue + 1;
+            }
 
-        return response()->json($order->load(['user', 'items.product', 'processor']));
+            $order->update($updateData);
+        });
+
+        return response()->json($order->fresh()->load(['user', 'items.product', 'processor']));
     }
 
     private function canAccessOrder(User $user, Order $order): bool

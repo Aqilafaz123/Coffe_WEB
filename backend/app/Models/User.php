@@ -34,6 +34,11 @@ class User extends Authenticatable
         return $this->role === 'cashier';
     }
 
+    public function isLogistics(): bool
+    {
+        return $this->role === 'logistics';
+    }
+
     /**
      * Get the attributes that should be cast.
      *
