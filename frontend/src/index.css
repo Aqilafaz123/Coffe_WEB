@@ -89,15 +89,48 @@ body {
 }
 
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 12mm 12mm;
+  }
+
   aside, header, nav, button, .no-print {
     display: none !important;
   }
+
   main {
     margin-left: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
+
   body {
-    background: white !important;
-    color: black !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Prevent elements from being sliced across page breaks */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-break-before {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
+

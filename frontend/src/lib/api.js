@@ -88,3 +88,48 @@ export async function downloadCashierReceipt(orderId, orderNumber) {
   link.remove();
   window.URL.revokeObjectURL(url);
 }
+
+export async function downloadPnLExcel(params = {}) {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null && v !== '')
+  );
+  const query = new URLSearchParams(cleanParams).toString();
+  const url = query ? `/pnl/export-excel?${query}` : '/pnl/export-excel';
+
+  const response = await api.get(url, {
+    responseType: 'blob',
+    headers: {
+      Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    },
+  });
+
+  const blob = response.data;
+
+  if (blob.type?.includes('json')) {
+    throw new Error(await parseBlobError(blob));
+  }
+
+  // Derive filename
+  let filename = 'Laporan-Keuangan-PnL.xlsx';
+  const disposition = response.headers['content-disposition'];
+  if (disposition && disposition.indexOf('filename=') !== -1) {
+    const filenameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    if (filenameMatch && filenameMatch[1]) {
+      filename = filenameMatch[1].replace(/['"]/g, '');
+    }
+  }
+
+  const blobUrl = window.URL.createObjectURL(
+    new Blob([blob], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+  );
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(blobUrl);
+}
+

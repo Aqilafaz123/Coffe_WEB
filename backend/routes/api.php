@@ -120,6 +120,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Profit and Loss (PnL) & Expenses
         Route::get('/pnl', [PnLController::class, 'report']);
+        Route::get('/pnl/export-excel', [PnLController::class, 'exportExcel']);
         Route::get('/expenses', [ExpenseController::class, 'index']);
         Route::post('/expenses', [ExpenseController::class, 'store']);
         Route::get('/expenses/categories', [ExpenseController::class, 'categories']);

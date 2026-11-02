@@ -9,13 +9,27 @@ import {
   Receipt,
   ArrowRight,
   Sparkles,
-  PieChart
+  PieChart,
+  FileSpreadsheet,
+  RefreshCw
 } from 'lucide-react';
-import api, { formatPrice } from '../../lib/api';
+import api, { formatPrice, downloadPnLExcel } from '../../lib/api';
 import DashboardLayout from '../../components/DashboardLayout';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [exportingExcel, setExportingExcel] = useState(false);
+
+  const handleExportExcel = async () => {
+    setExportingExcel(true);
+    try {
+      await downloadPnLExcel({ period: 'this_month' });
+    } catch (err) {
+      alert(err.message || 'Gagal mengekspor laporan keuangan ke Excel.');
+    } finally {
+      setExportingExcel(false);
+    }
+  };
 
   useEffect(() => {
     api.get('/dashboard/stats').then((r) => setStats(r.data));
@@ -72,13 +86,29 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <Link
-            to="/admin/pnl"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-light text-coffee-950 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95 self-start md:self-auto"
-          >
-            Buka Laporan PnL Lengkap
-            <ArrowRight size={16} />
-          </Link>
+          <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+            <button
+              onClick={handleExportExcel}
+              disabled={exportingExcel}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition-all shadow-md active:scale-95 disabled:opacity-50"
+              title="Unduh laporan keuangan bulan ini dalam format Excel (.xlsx)"
+            >
+              {exportingExcel ? (
+                <RefreshCw size={16} className="animate-spin" />
+              ) : (
+                <FileSpreadsheet size={16} />
+              )}
+              {exportingExcel ? 'Mengunduh...' : 'Export Excel (.xlsx)'}
+            </button>
+
+            <Link
+              to="/admin/pnl"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold hover:bg-gold-light text-coffee-950 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+            >
+              Buka Laporan PnL Lengkap
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
 
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

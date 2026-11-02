@@ -47,8 +47,8 @@ export default function DashboardLayout({ children, title, role }) {
   };
 
   return (
-    <div className="min-h-screen bg-coffee-50 flex">
-      <aside className="w-64 bg-coffee-900 text-white flex flex-col fixed h-full">
+    <div className="min-h-screen bg-coffee-50 flex print:bg-white print:block w-full overflow-x-hidden">
+      <aside className="w-64 bg-coffee-900 text-white flex flex-col fixed h-full no-print print:hidden">
         <div className="p-6 border-b border-white/10">
           <Link to="/" className="flex items-center gap-3 group">
             <img
@@ -96,8 +96,8 @@ export default function DashboardLayout({ children, title, role }) {
         </div>
       </aside>
 
-      <main className="flex-1 ml-64">
-        <header className="bg-white border-b border-coffee-100 px-8 py-6 sticky top-0 z-10">
+      <main className="flex-1 min-w-0 ml-64 print:ml-0 print:p-0">
+        <header className="bg-white border-b border-coffee-100 px-8 py-6 sticky top-0 z-10 no-print print:hidden">
           <div className="flex items-center justify-between">
             <h1 className="font-display text-2xl font-bold text-coffee-900">{title}</h1>
             <Link to="/" className="text-coffee-500 text-sm hover:text-coffee-900 transition-colors flex items-center gap-2">
@@ -106,8 +106,10 @@ export default function DashboardLayout({ children, title, role }) {
             </Link>
           </div>
         </header>
-        <div className="p-8">{children}</div>
+        <div className="p-8 print:p-0 max-w-full">{children}</div>
       </main>
     </div>
   );
+
+
 }

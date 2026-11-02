@@ -6,66 +6,92 @@ use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\Order;
 use App\Models\RoomReservation;
+use App\Services\FinancialReportExportService;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PnLController extends Controller
 {
     public function report(Request $request): JsonResponse
     {
-        $period = $request->input('period', 'this_month');
-        $now = Carbon::now();
+        $data = $this->calculateReportData($request);
 
-        switch ($period) {
-            case 'today':
-                $startDate = $now->copy()->startOfDay();
-                $endDate = $now->copy()->endOfDay();
-                $periodLabel = 'Hari Ini (' . $now->translatedFormat('d F Y') . ')';
-                break;
-            case 'yesterday':
-                $yesterday = $now->copy()->subDay();
-                $startDate = $yesterday->copy()->startOfDay();
-                $endDate = $yesterday->copy()->endOfDay();
-                $periodLabel = 'Kemarin (' . $yesterday->translatedFormat('d F Y') . ')';
-                break;
-            case 'this_week':
-                $startDate = $now->copy()->startOfWeek();
-                $endDate = $now->copy()->endOfWeek();
-                $periodLabel = 'Minggu Ini (' . $startDate->translatedFormat('d M') . ' - ' . $endDate->translatedFormat('d M Y') . ')';
-                break;
-            case 'last_month':
-                $lastMonth = $now->copy()->subMonth();
-                $startDate = $lastMonth->copy()->startOfMonth();
-                $endDate = $lastMonth->copy()->endOfMonth();
-                $periodLabel = 'Bulan Lalu (' . $lastMonth->translatedFormat('F Y') . ')';
-                break;
-            case 'this_year':
-                $startDate = $now->copy()->startOfYear();
-                $endDate = $now->copy()->endOfYear();
-                $periodLabel = 'Tahun Ini (' . $now->year . ')';
-                break;
-            case 'all_time':
-                $startDate = Carbon::create(2020, 1, 1)->startOfDay();
-                $endDate = $now->copy()->endOfDay();
-                $periodLabel = 'Semua Waktu';
-                break;
-            case 'custom':
-                $s = $request->input('start_date');
-                $e = $request->input('end_date');
-                $startDate = $s ? Carbon::parse($s)->startOfDay() : $now->copy()->startOfMonth();
-                $endDate = $e ? Carbon::parse($e)->endOfDay() : $now->copy()->endOfDay();
-                $periodLabel = $startDate->translatedFormat('d M Y') . ' - ' . $endDate->translatedFormat('d M Y');
-                break;
-            case 'this_month':
-            default:
-                $period = 'this_month';
-                $startDate = $now->copy()->startOfMonth();
-                $endDate = $now->copy()->endOfMonth();
-                $periodLabel = 'Bulan Ini (' . $now->translatedFormat('F Y') . ')';
-                break;
+        return response()->json($data);
+    }
+
+    public function exportExcel(Request $request, FinancialReportExportService $exportService): StreamedResponse
+    {
+        $data = $this->calculateReportData($request);
+        $user = $request->user();
+
+        return $exportService->generateExcel($data, $user ? $user->name : 'Super Admin');
+    }
+
+    public function calculateReportData(Request $request): array
+    {
+        $now = Carbon::now();
+        $period = $request->input('period', 'this_month');
+
+        if ($request->filled('month') && $request->filled('year')) {
+            $month = (int) $request->input('month');
+            $year = (int) $request->input('year');
+            $targetDate = Carbon::createFromDate($year, $month, 1);
+            $startDate = $targetDate->copy()->startOfMonth();
+            $endDate = $targetDate->copy()->endOfMonth();
+            $periodLabel = 'Bulan ' . $targetDate->translatedFormat('F Y');
+            $period = 'monthly';
+        } else {
+            switch ($period) {
+                case 'today':
+                    $startDate = $now->copy()->startOfDay();
+                    $endDate = $now->copy()->endOfDay();
+                    $periodLabel = 'Hari Ini (' . $now->translatedFormat('d F Y') . ')';
+                    break;
+                case 'yesterday':
+                    $yesterday = $now->copy()->subDay();
+                    $startDate = $yesterday->copy()->startOfDay();
+                    $endDate = $yesterday->copy()->endOfDay();
+                    $periodLabel = 'Kemarin (' . $yesterday->translatedFormat('d F Y') . ')';
+                    break;
+                case 'this_week':
+                    $startDate = $now->copy()->startOfWeek();
+                    $endDate = $now->copy()->endOfWeek();
+                    $periodLabel = 'Minggu Ini (' . $startDate->translatedFormat('d M') . ' - ' . $endDate->translatedFormat('d M Y') . ')';
+                    break;
+                case 'last_month':
+                    $lastMonth = $now->copy()->subMonth();
+                    $startDate = $lastMonth->copy()->startOfMonth();
+                    $endDate = $lastMonth->copy()->endOfMonth();
+                    $periodLabel = 'Bulan Lalu (' . $lastMonth->translatedFormat('F Y') . ')';
+                    break;
+                case 'this_year':
+                    $startDate = $now->copy()->startOfYear();
+                    $endDate = $now->copy()->endOfYear();
+                    $periodLabel = 'Tahun Ini (' . $now->year . ')';
+                    break;
+                case 'all_time':
+                    $startDate = Carbon::create(2020, 1, 1)->startOfDay();
+                    $endDate = $now->copy()->endOfDay();
+                    $periodLabel = 'Semua Waktu';
+                    break;
+                case 'custom':
+                    $s = $request->input('start_date');
+                    $e = $request->input('end_date');
+                    $startDate = $s ? Carbon::parse($s)->startOfDay() : $now->copy()->startOfMonth();
+                    $endDate = $e ? Carbon::parse($e)->endOfDay() : $now->copy()->endOfDay();
+                    $periodLabel = $startDate->translatedFormat('d M Y') . ' - ' . $endDate->translatedFormat('d M Y');
+                    break;
+                case 'this_month':
+                default:
+                    $period = 'this_month';
+                    $startDate = $now->copy()->startOfMonth();
+                    $endDate = $now->copy()->endOfMonth();
+                    $periodLabel = 'Bulan Ini (' . $now->translatedFormat('F Y') . ')';
+                    break;
+            }
         }
 
         $startDateStr = $startDate->format('Y-m-d H:i:s');
@@ -102,6 +128,8 @@ class PnLController extends Controller
         $totalItemsSold = 0;
         $productMetrics = [];
         $ordersWithPnl = [];
+        $dailySalesMap = [];
+        $orderItemsDetail = [];
 
         foreach ($orders as $order) {
             $orderGross = (float) $order->subtotal;
@@ -112,6 +140,15 @@ class PnLController extends Controller
             $grossSales += $orderGross;
             $totalDiscounts += $orderDiscount;
             $netOrderRevenue += $orderNet;
+
+            $orderDateObj = Carbon::parse($order->paid_at ?? $order->completed_at ?? $order->created_at);
+            $orderDateKey = $orderDateObj->format('Y-m-d');
+            $orderTimeKey = $orderDateObj->format('H:i');
+            $paymentMethodStr = strtoupper($order->payment_method ?: 'CASH');
+            $customerNameStr = $order->user ? $order->user->name : ($order->guest_name ?: 'Pelanggan');
+
+            $orderItemsList = [];
+            $itemsSummaryParts = [];
 
             foreach ($order->items as $item) {
                 $unitPrice = (float) $item->unit_price;
@@ -152,26 +189,102 @@ class PnLController extends Controller
                 $productMetrics[$productId]['total_revenue'] += $itemRevenue;
                 $productMetrics[$productId]['total_cogs'] += $itemCogs;
                 $productMetrics[$productId]['gross_profit'] += $itemProfit;
+
+                $orderItemsList[] = [
+                    'product_id' => $productId,
+                    'product_name' => $productName,
+                    'category' => $categoryName,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'subtotal' => $itemRevenue,
+                ];
+
+                $itemsSummaryParts[] = "{$quantity}x {$productName}";
+
+                // Flattened row for detailed menu sales sheet
+                $orderItemsDetail[] = [
+                    'date' => $orderDateKey,
+                    'formatted_date' => $orderDateObj->format('d/m/Y'),
+                    'time' => $orderTimeKey,
+                    'order_number' => $order->order_number,
+                    'customer_name' => $customerNameStr,
+                    'product_name' => $productName,
+                    'category' => $categoryName,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'subtotal' => $itemRevenue,
+                    'payment_method' => $paymentMethodStr,
+                    'order_total' => $orderNet,
+                ];
             }
 
             $totalCogs += $orderCogs;
             $orderGrossProfit = $orderNet - $orderCogs;
             $orderMarginPct = $orderNet > 0 ? round(($orderGrossProfit / $orderNet) * 100, 1) : 0;
 
+            // Group into daily sales
+            if (! isset($dailySalesMap[$orderDateKey])) {
+                $dailySalesMap[$orderDateKey] = [
+                    'date' => $orderDateKey,
+                    'formatted_date' => $orderDateObj->translatedFormat('d M Y'),
+                    'day_name' => $orderDateObj->translatedFormat('l'),
+                    'orders_count' => 0,
+                    'items_count' => 0,
+                    'gross_sales' => 0.0,
+                    'total_discounts' => 0.0,
+                    'net_revenue' => 0.0,
+                    'cash_total' => 0.0,
+                    'qris_total' => 0.0,
+                    'other_payment_total' => 0.0,
+                    'payment_methods_count' => [],
+                ];
+            }
+
+            $dailySalesMap[$orderDateKey]['orders_count'] += 1;
+            $dailySalesMap[$orderDateKey]['items_count'] += (int) $order->items->sum('quantity');
+            $dailySalesMap[$orderDateKey]['gross_sales'] += $orderGross;
+            $dailySalesMap[$orderDateKey]['total_discounts'] += $orderDiscount;
+            $dailySalesMap[$orderDateKey]['net_revenue'] += $orderNet;
+
+            if (stripos($paymentMethodStr, 'CASH') !== false || stripos($paymentMethodStr, 'TUNAI') !== false) {
+                $dailySalesMap[$orderDateKey]['cash_total'] += $orderNet;
+            } elseif (stripos($paymentMethodStr, 'QRIS') !== false) {
+                $dailySalesMap[$orderDateKey]['qris_total'] += $orderNet;
+            } else {
+                $dailySalesMap[$orderDateKey]['other_payment_total'] += $orderNet;
+            }
+
+            if (! isset($dailySalesMap[$orderDateKey]['payment_methods_count'][$paymentMethodStr])) {
+                $dailySalesMap[$orderDateKey]['payment_methods_count'][$paymentMethodStr] = 0;
+            }
+            $dailySalesMap[$orderDateKey]['payment_methods_count'][$paymentMethodStr] += 1;
+
             $ordersWithPnl[] = [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
-                'date' => Carbon::parse($order->paid_at ?? $order->completed_at ?? $order->created_at)->format('Y-m-d H:i'),
-                'customer_name' => $order->user ? $order->user->name : ($order->guest_name ?: 'Pelanggan'),
-                'payment_method' => $order->payment_method ?: 'cash',
+                'date' => $orderDateObj->format('Y-m-d H:i'),
+                'customer_name' => $customerNameStr,
+                'payment_method' => $paymentMethodStr,
+                'items_summary' => implode('; ', $itemsSummaryParts),
                 'subtotal' => $orderGross,
                 'discount' => $orderDiscount,
                 'total' => $orderNet,
                 'cogs' => round($orderCogs, 2),
                 'gross_profit' => round($orderGrossProfit, 2),
                 'margin_pct' => $orderMarginPct,
+                'items' => $orderItemsList,
             ];
         }
+
+        // Sort daily sales chronologically ascending
+        ksort($dailySalesMap);
+        foreach ($dailySalesMap as &$day) {
+            $methods = $day['payment_methods_count'] ?? [];
+            arsort($methods);
+            $day['dominant_payment_method'] = ! empty($methods) ? key($methods) : 'CASH';
+        }
+        unset($day);
+        $dailySalesList = array_values($dailySalesMap);
 
         // Calculate margin % for each product metric
         foreach ($productMetrics as &$pm) {
@@ -222,7 +335,7 @@ class PnLController extends Controller
         // 6. Trend / Chart Data
         $chartData = $this->buildChartData($startDate, $endDate, $orders, $reservations, $expenses);
 
-        return response()->json([
+        return [
             'period' => $period,
             'period_label' => $periodLabel,
             'start_date' => $startDateOnly,
@@ -246,8 +359,11 @@ class PnLController extends Controller
             'chart_data' => $chartData,
             'expenses_by_category' => $expensesByCategory,
             'product_margins' => array_values($productMetrics),
-            'recent_orders' => array_slice($ordersWithPnl, 0, 15),
-        ]);
+            'daily_sales' => $dailySalesList,
+            'order_items_detail' => $orderItemsDetail,
+            'all_orders' => $ordersWithPnl,
+            'recent_orders' => array_slice($ordersWithPnl, 0, 50),
+        ];
     }
 
     private function buildChartData(Carbon $startDate, Carbon $endDate, $orders, $reservations, $expenses): array
