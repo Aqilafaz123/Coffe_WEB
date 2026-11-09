@@ -286,8 +286,8 @@ export default function Login() {
               </Link>
             </p>
 
-            {/* ── DEMO ACCOUNTS ── */}
-            <div
+            {/* ── DEMO ACCOUNTS (development only) ── */}
+            {import.meta.env.DEV && (<div
               className="slide-up-4 mt-7 rounded-2xl p-4"
               style={{ background: '#eef3fb', border: '1.5px solid #cfe0fb' }}
             >
@@ -317,7 +317,7 @@ export default function Login() {
               <p className="text-center text-xs mt-3" style={{ color: '#6893e4' }}>
                 Klik untuk isi otomatis · pass: <span className="font-semibold" style={{ color: '#081b56' }}>password</span>
               </p>
-            </div>
+            </div>)}
 
           </div>
         </div>
