@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays, Boxes, ScrollText, History, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, Coffee, BarChart3, Store, ShoppingBag, UserPlus, Tag, DoorOpen, CalendarDays, Boxes, ScrollText, History, TrendingUp, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const sharedOrderLinks = [
@@ -65,7 +65,7 @@ export default function DashboardLayout({ children, title, role }) {
           <p className="text-white/50 text-xs mt-2.5 capitalize">{roleName}</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {links.map(({ to, icon: Icon, label }) => (
             <Link
               key={to}
@@ -87,6 +87,9 @@ export default function DashboardLayout({ children, title, role }) {
             <p className="text-sm font-medium">{user?.name}</p>
             <p className="text-xs text-white/50">{user?.email}</p>
           </div>
+          <Link to="/akun/password" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/80 hover:bg-white/10">
+            <KeyRound size={18} /> Ganti Password
+          </Link>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/10 w-full transition-colors"

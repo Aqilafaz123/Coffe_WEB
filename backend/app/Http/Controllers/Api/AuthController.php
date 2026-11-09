@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthController extends Controller
 {
@@ -17,7 +19,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', 'confirmed', Password::min(6)],
             'phone' => ['nullable', 'string', 'max:20'],
         ]);
 
@@ -63,6 +65,31 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Berhasil logout.']);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6', 'max:72', 'confirmed', 'different:current_password'],
+        ]);
+
+        DB::transaction(function () use ($request, $validated) {
+            $user = User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            if (! Hash::check($validated['current_password'], $user->password)) {
+                throw ValidationException::withMessages(['current_password' => ['Password lama tidak sesuai.']]);
+            }
+            $user->update(['password' => Hash::make($validated['password'])]);
+            $currentToken = $request->user()->currentAccessToken();
+            $tokenId = $currentToken instanceof PersonalAccessToken ? $currentToken->getKey() : null;
+            $tokens = $user->tokens();
+            if ($tokenId !== null) {
+                $tokens->where('id', '!=', $tokenId);
+            }
+            $tokens->delete();
+        });
+
+        return response()->json(['message' => 'Password berhasil diubah. Sesi login lain telah dikeluarkan.']);
     }
 
     public function me(Request $request): JsonResponse

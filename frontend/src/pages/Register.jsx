@@ -169,7 +169,7 @@ export default function Register() {
                     onChange={handleChange}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField('')}
-                    placeholder="Min. 8 karakter"
+                    placeholder="Min. 6 karakter"
                     className="flex-1 bg-transparent outline-none text-sm"
                     style={{ color: '#081b56', caretColor: '#081b56' }}
                     required

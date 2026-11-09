@@ -38,6 +38,7 @@ Route::get('/queue/status', [QueueController::class, 'status']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::put('/me/password', [AuthController::class, 'changePassword'])->middleware('throttle:6,1');
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::post('/orders', [OrderController::class, 'store']);

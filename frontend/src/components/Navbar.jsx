@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X, User, LogOut, History, Clock } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, User, LogOut, History, Clock, KeyRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import api, { formatPrice } from '../lib/api';
@@ -150,6 +150,7 @@ export default function Navbar() {
                   <User size={18} />
                   <span>{user.name.split(' ')[0]}</span>
                 </Link>
+                <Link to="/akun/password" title="Ganti Password" aria-label="Ganti Password" className="text-white/80 hover:text-white p-2"><KeyRound size={18} /></Link>
                 <button onClick={logout} className="text-white/60 hover:text-white transition-colors p-2" aria-label="Logout">
                   <LogOut size={18} />
                 </button>
@@ -285,6 +286,7 @@ export default function Navbar() {
                 >
                   {user.role === 'user' ? 'Akun Saya' : 'Dashboard'}
                 </Link>
+                <Link to="/akun/password" onClick={() => setOpen(false)} className="block text-white/80 hover:text-white py-2 text-sm">Ganti Password</Link>
                 <button onClick={() => { logout(); setOpen(false); }} className="text-white/60 hover:text-white py-2 text-sm">
                   Logout
                 </button>

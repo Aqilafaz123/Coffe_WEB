@@ -4,6 +4,7 @@ import { CartProvider } from './context/CartContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Shop from './pages/Shop';
+import ChangePassword from './pages/ChangePassword';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Cart from './pages/Cart';
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/akun/password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
             <Route path="/register" element={<Register />} />
             <Route path="/reservasi" element={<Navigate to="/" replace />} />
             <Route path="/lokasi" element={<Location />} />

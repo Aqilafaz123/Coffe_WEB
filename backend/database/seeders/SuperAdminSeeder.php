@@ -25,14 +25,14 @@ class SuperAdminSeeder extends Seeder
         $data = [
             'name' => trim((string) $this->command->ask('Nama superadmin', 'Super Admin')),
             'email' => strtolower(trim((string) $this->command->ask('Email superadmin'))),
-            'password' => $this->command->secret('Password superadmin (minimal 12 karakter)'),
+            'password' => $this->command->secret('Password superadmin (minimal 6 karakter)'),
             'password_confirmation' => $this->command->secret('Ulangi password superadmin'),
         ];
 
         Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:12', 'confirmed'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
         ])->validate();
 
         User::create([

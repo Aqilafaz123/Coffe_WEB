@@ -31,12 +31,12 @@ class SuperAdminSeederTest extends TestCase
 
     public function test_it_creates_only_one_superadmin_and_preserves_existing_credentials_on_rerun(): void
     {
-        $seeder = $this->seeder('admin@example.com', 'Strong-production-123');
+        $seeder = $this->seeder('admin@example.com', 'abc123');
         $seeder->run();
         $user = User::sole();
         $this->assertSame('superadmin', $user->role);
         $this->assertSame('admin@example.com', $user->email);
-        $this->assertTrue(Hash::check('Strong-production-123', $user->password));
+        $this->assertTrue(Hash::check('abc123', $user->password));
         $hash = $user->password;
         $seeder->run();
         $this->assertSame(1, User::count());
@@ -47,7 +47,7 @@ class SuperAdminSeederTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         try {
-            $this->seeder('admin@example.com', 'password')->run();
+            $this->seeder('admin@example.com', '12345')->run();
         } finally {
             $this->assertSame(0, User::count());
         }
@@ -58,7 +58,7 @@ class SuperAdminSeederTest extends TestCase
         $user = User::factory()->create(['email' => 'customer@example.com', 'role' => 'user']);
         $this->expectException(ValidationException::class);
         try {
-            $this->seeder($user->email, 'Strong-production-123')->run();
+            $this->seeder($user->email, 'abc123')->run();
         } finally {
             $this->assertSame('user', $user->fresh()->role);
             $this->assertSame(1, User::count());
