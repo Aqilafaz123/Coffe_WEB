@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import api, { formatPrice } from '../../lib/api';
 import DashboardLayout from '../../components/DashboardLayout';
@@ -125,6 +126,7 @@ export default function AdminProducts() {
                 <option value="">Pilih Kategori</option>
                 {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
+              <Link to="/admin/categories" className="block text-sm text-blue-700 hover:underline">{categories.length ? 'Kelola kategori' : 'Belum ada kategori? Tambah kategori terlebih dahulu'}</Link>
               <input placeholder="URL Gambar" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="input-field" />
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 text-sm">

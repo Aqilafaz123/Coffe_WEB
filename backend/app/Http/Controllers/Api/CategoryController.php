@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
@@ -17,6 +19,21 @@ class CategoryController extends Controller
         );
     }
 
+    public function manage(): JsonResponse
+    {
+        return response()->json(Category::withCount('products')->orderBy('name')->get());
+    }
+
+    private function validateSlug(string $name, ?Category $category = null): string
+    {
+        $slug = Str::slug($name);
+        Validator::make(['slug' => $slug], [
+            'slug' => ['required', 'max:255', Rule::unique('categories', 'slug')->ignore($category?->id)],
+        ], ['slug.required' => 'Nama kategori harus berisi huruf atau angka.', 'slug.unique' => 'Nama kategori sudah digunakan.'])->validate();
+
+        return $slug;
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -25,7 +42,7 @@ class CategoryController extends Controller
             'is_active' => ['boolean'],
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = $this->validateSlug($validated['name']);
 
         $category = Category::create($validated);
 
@@ -41,7 +58,7 @@ class CategoryController extends Controller
         ]);
 
         if (isset($validated['name'])) {
-            $validated['slug'] = Str::slug($validated['name']);
+            $validated['slug'] = $this->validateSlug($validated['name'], $category);
         }
 
         $category->update($validated);
@@ -51,6 +68,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $category): JsonResponse
     {
+        if ($category->products()->exists()) {
+            return response()->json(['message' => 'Kategori masih digunakan produk. Pindahkan produknya atau nonaktifkan kategori.'], 422);
+        }
+
         $category->delete();
 
         return response()->json(['message' => 'Kategori berhasil dihapus.']);

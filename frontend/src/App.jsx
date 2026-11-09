@@ -14,6 +14,7 @@ import CashierPOS from './pages/cashier/CashierPOS';
 import CashierOrders from './pages/cashier/CashierOrders';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminPnL from './pages/admin/AdminPnL';
+import AdminCategories from './pages/admin/AdminCategories';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminOrders from './pages/admin/AdminOrders';
@@ -111,6 +112,7 @@ export default function App() {
                 <AdminPnL />
               </ProtectedRoute>
             } />
+            <Route path="/admin/categories" element={<ProtectedRoute roles={['superadmin']}><AdminCategories /></ProtectedRoute>} />
             <Route path="/admin/products" element={
               <ProtectedRoute roles={['superadmin']}>
                 <AdminProducts />

@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:superadmin')->group(function () {
         // Queue reset
         Route::post('/queue/reset', [QueueController::class, 'reset']);
+        Route::get('/admin/categories', [CategoryController::class, 'manage']);
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{category}', [CategoryController::class, 'update']);
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);

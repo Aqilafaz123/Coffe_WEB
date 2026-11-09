@@ -12,6 +12,7 @@ const adminLinks = [
   { to: '/admin/pnl', icon: TrendingUp, label: 'Laba Rugi (P&L)' },
   { to: '/admin/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
+  { to: '/admin/categories', icon: Tag, label: 'Kategori' },
   { to: '/admin/products', icon: Package, label: 'Produk' },
   { to: '/admin/bahan', icon: Boxes, label: 'Bahan Baku' },
   { to: '/admin/resep', icon: ScrollText, label: 'Resep Produk' },
