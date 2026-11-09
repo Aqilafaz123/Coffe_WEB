@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Ingredient;
 use App\Models\IngredientMutation;
 use App\Models\Order;
 use App\Models\Voucher;
@@ -40,6 +39,7 @@ class OrderPaymentService
             $order->update([
                 'payment_method' => $paymentMethod,
                 'payment_status' => 'paid',
+                'qris_slot' => null,
                 'status' => 'pending',
                 'paid_at' => now(),
                 'queue_number' => $order->queue_number,

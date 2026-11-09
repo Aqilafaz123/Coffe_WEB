@@ -12,10 +12,17 @@ class Order extends Model
         'order_number', 'user_id', 'guest_name', 'guest_phone', 'table_location', 'status',
         'payment_method', 'midtrans_transaction_id', 'payment_status', 'paid_at',
         'subtotal', 'discount', 'voucher_code', 'total', 'notes', 'processed_by', 'completed_at',
-        'queue_number', 'queue_called_at',
+        'order_source', 'cash_received', 'queue_number', 'queue_called_at', 'qris_code', 'qris_slot', 'qris_amount', 'payment_proof_path',
     ];
 
-    protected $appends = ['customer_name'];
+    protected $appends = ['customer_name', 'has_payment_proof'];
+
+    protected $hidden = ['payment_proof_path'];
+
+    public function getHasPaymentProofAttribute(): bool
+    {
+        return ! empty($this->payment_proof_path);
+    }
 
     protected static function booted(): void
     {
@@ -56,6 +63,8 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
+            'cash_received' => 'decimal:2',
+            'qris_amount' => 'decimal:2',
             'completed_at' => 'datetime',
             'paid_at' => 'datetime',
             'queue_called_at' => 'datetime',

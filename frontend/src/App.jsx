@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Cart from './pages/Cart';
 import UserHistory from './pages/UserHistory';
 import CashierDashboard from './pages/cashier/CashierDashboard';
+import CashierPOS from './pages/cashier/CashierPOS';
 import CashierOrders from './pages/cashier/CashierOrders';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminPnL from './pages/admin/AdminPnL';
@@ -82,6 +83,7 @@ export default function App() {
                 <CashierDashboard />
               </ProtectedRoute>
             } />
+            <Route path="/kasir/pos" element={<ProtectedRoute roles={['cashier']}><CashierPOS /></ProtectedRoute>} />
             <Route path="/kasir/orders" element={
               <ProtectedRoute roles={['cashier']}>
                 <CashierOrders />

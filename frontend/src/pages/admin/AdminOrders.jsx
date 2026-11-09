@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import api, { formatPrice } from '../../lib/api';
 import { getOrderCustomerLabel, isWalkInOrder } from '../../lib/orderHelpers';
@@ -79,7 +80,9 @@ export default function AdminOrders() {
               <div className="flex justify-between font-semibold border-t border-coffee-100 pt-4 mb-4">
                 <span>Total</span>
                 <span>{formatPrice(order.total)}</span>
+                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
               </div>
+              {order.status === 'awaiting_payment' && <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block mb-3">Periksa Pembayaran & Bukti</Link>}
               {order.payment_status === 'paid' && (
                 <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
               )}

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Voucher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class VoucherController extends Controller
@@ -100,11 +101,19 @@ class VoucherController extends Controller
 
         $discount = $voucher->calculateDiscount((float) $order->subtotal);
 
-        $order->update([
-            'voucher_code' => $voucher->code,
-            'discount' => $discount,
-            'total' => max(0, $order->subtotal - $discount),
-        ]);
+        DB::transaction(function () use ($order, $voucher, $discount) {
+            $order = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            abort_unless($order->status === 'awaiting_payment', 422, 'Pesanan tidak dapat diubah.');
+            abort_if($order->has_payment_proof, 422, 'Voucher tidak dapat diubah setelah bukti bayar dikirim.');
+            $order->update([
+                'qris_amount' => null, 'qris_code' => null, 'qris_slot' => null,
+                'voucher_code' => $voucher->code,
+                'discount' => $discount,
+                'total' => max(0, $order->subtotal - $discount),
+            ]);
+
+        });
+        $order->refresh();
 
         return response()->json($order->load(['items.product']));
     }
@@ -119,11 +128,19 @@ class VoucherController extends Controller
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
-        $order->update([
-            'voucher_code' => null,
-            'discount' => 0,
-            'total' => $order->subtotal,
-        ]);
+        DB::transaction(function () use ($order) {
+            $order = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            abort_unless($order->status === 'awaiting_payment', 422, 'Pesanan tidak dapat diubah.');
+            abort_if($order->has_payment_proof, 422, 'Voucher tidak dapat diubah setelah bukti bayar dikirim.');
+            $order->update([
+                'qris_amount' => null, 'qris_code' => null, 'qris_slot' => null,
+                'voucher_code' => null,
+                'discount' => 0,
+                'total' => $order->subtotal,
+            ]);
+
+        });
+        $order->refresh();
 
         return response()->json($order->load(['items.product']));
     }

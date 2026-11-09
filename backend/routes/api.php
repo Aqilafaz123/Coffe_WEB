@@ -45,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show']);
     Route::get('/orders/{order}/receipt', [OrderController::class, 'receipt']);
     Route::get('/orders/{order}/cashier-receipt', [OrderController::class, 'cashierReceipt']);
+    Route::post('/orders/{order}/payment-proof', [OrderController::class, 'uploadPaymentProof']);
+    Route::get('/orders/{order}/payment-proof', [OrderController::class, 'paymentProof']);
+    Route::post('/orders/{order}/qris', [OrderController::class, 'qris']);
     Route::post('/orders/{order}/pay', [OrderController::class, 'processPayment']);
     Route::post('/orders/{order}/snap-token', [MidtransController::class, 'snapToken']);
     Route::post('/orders/{order}/verify-payment', [MidtransController::class, 'verifyPayment']);

@@ -22,6 +22,7 @@ const adminLinks = [
 
 const cashierLinks = [
   { to: '/kasir', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/kasir/pos', icon: Store, label: 'Transaksi Offline / POS' },
   { to: '/kasir/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
   { to: '/kasir/orders', icon: ShoppingCart, label: 'Pesanan' },

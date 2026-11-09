@@ -186,6 +186,7 @@ export default function UserHistory() {
                       <div className="flex justify-between font-semibold border-t border-coffee-100 pt-4 mb-4">
                         <span>Total</span>
                         <span className="text-coffee-900">{formatPrice(order.total)}</span>
+                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
                       </div>
                       {canDownloadReceipt(order) && (
                         <p className="text-coffee-500 text-sm mb-3">

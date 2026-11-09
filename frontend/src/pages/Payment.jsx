@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CreditCard, CheckCircle, Loader2, Tag, Wallet, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api, { formatPrice } from '../lib/api';
-import { loadMidtransSnap } from '../lib/midtrans';
+import QRCode from 'qrcode';
+import PaymentProof from '../components/PaymentProof';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import DownloadReceiptButton from '../components/DownloadReceiptButton';
@@ -22,7 +23,8 @@ export default function Payment() {
   const [voucherCode, setVoucherCode] = useState('');
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [voucherMsg, setVoucherMsg] = useState('');
-  const [snapReady, setSnapReady] = useState(false);
+  const [qrisImage, setQrisImage] = useState('');
+  const [qrisTotal, setQrisTotal] = useState(null);
 
   const isStaff = user?.role === 'cashier' || user?.role === 'superadmin';
   const donePath = user?.role === 'cashier' ? '/kasir/orders' : user?.role === 'superadmin' ? '/admin/orders' : '/riwayat';
@@ -32,7 +34,7 @@ export default function Payment() {
       .then((r) => {
         setOrder(r.data);
         const staff = user?.role === 'cashier' || user?.role === 'superadmin';
-        if (r.data.status !== 'awaiting_payment') {
+        if (r.data.payment_status === 'paid') {
           setPaid(true);
         } else if (!staff && r.data.payment_method === 'cash' && r.data.payment_status === 'unpaid') {
           setCashPending(true);
@@ -43,11 +45,17 @@ export default function Payment() {
   }, [orderId, user?.role]);
 
   useEffect(() => {
-    const isProduction = import.meta.env.VITE_MIDTRANS_IS_PRODUCTION === 'true';
-    loadMidtransSnap(isProduction)
-      .then(() => setSnapReady(true))
-      .catch(() => setError('Gagal memuat gateway pembayaran.'));
-  }, []);
+    if (!order?.qris_amount || order?.payment_method !== 'qris' || paid) return;
+    const timer = setInterval(async () => {
+      try {
+        const { data } = await api.get(`/orders/${orderId}`);
+        setOrder(data);
+        if (data.payment_status === 'paid') setPaid(true);
+        if (Number(data.qris_amount) !== Number(qrisTotal) || data.status !== 'awaiting_payment') setQrisImage('');
+      } catch { /* Retry on the next poll. */ }
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [order?.qris_amount, order?.payment_method, qrisTotal, paid, orderId]);
 
   const handleApplyVoucher = async () => {
     if (!voucherCode.trim()) return;
@@ -57,6 +65,7 @@ export default function Payment() {
     try {
       const { data } = await api.post(`/orders/${orderId}/voucher`, { code: voucherCode.trim() });
       setOrder(data);
+      setQrisImage('');
       setVoucherMsg('Voucher berhasil dipakai!');
       setVoucherCode('');
     } catch (err) {
@@ -72,6 +81,7 @@ export default function Payment() {
     try {
       const { data } = await api.delete(`/orders/${orderId}/voucher`);
       setOrder(data);
+      setQrisImage('');
       setVoucherMsg('Voucher dihapus.');
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal menghapus voucher.');
@@ -80,49 +90,34 @@ export default function Payment() {
     }
   };
 
-  const verifyAndComplete = async () => {
-    const { data } = await api.post(`/orders/${orderId}/verify-payment`);
-    if (data.payment_status === 'paid') {
-      setPaid(true);
-      setOrder(data);
-      return true;
+  const handleQrisPay = async () => {
+    setProcessing(true);
+    setError('');
+    setQrisImage('');
+    try {
+      const { data } = await api.post(`/orders/${orderId}/qris`);
+      const image = await QRCode.toDataURL(data.payload, { width: 320, margin: 4, errorCorrectionLevel: 'M' });
+      setOrder((previous) => ({ ...previous, ...data.order }));
+      setQrisTotal(data.total);
+      setQrisImage(image);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal membuat QRIS.');
+    } finally {
+      setProcessing(false);
     }
-    return false;
   };
 
-  const handleMidtransPay = async () => {
-    if (!snapReady) return;
+  const handleConfirmQris = async () => {
+    if (!confirm('Pastikan dana QRIS sudah diterima sesuai nominal termasuk kode unik, dan bukti bayar cocok. Konfirmasi pembayaran?')) return;
     setProcessing(true);
     setError('');
     try {
-      const { data } = await api.post(`/orders/${orderId}/snap-token`);
-      window.snap.pay(data.snap_token, {
-        onSuccess: async () => {
-          try {
-            const success = await verifyAndComplete();
-            if (!success) {
-              navigate(`/pembayaran/${orderId}/selesai`);
-            }
-          } catch {
-            navigate(`/pembayaran/${orderId}/selesai`);
-          } finally {
-            setProcessing(false);
-          }
-        },
-        onPending: () => {
-          setProcessing(false);
-          navigate(`/pembayaran/${orderId}/selesai`);
-        },
-        onError: () => {
-          setError('Pembayaran gagal. Silakan coba lagi.');
-          setProcessing(false);
-        },
-        onClose: () => {
-          setProcessing(false);
-        },
-      });
+      const { data } = await api.post(`/orders/${orderId}/pay`, { payment_method: 'qris' });
+      setOrder(data);
+      setPaid(true);
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal memulai pembayaran.');
+      setError(err.response?.data?.message || 'Gagal mengonfirmasi pembayaran.');
+    } finally {
       setProcessing(false);
     }
   };
@@ -246,7 +241,7 @@ export default function Payment() {
                         <p className="font-medium text-green-800 text-sm">{order.voucher_code}</p>
                         <p className="text-green-600 text-xs">Hemat {formatPrice(order.discount)}</p>
                       </div>
-                      <button type="button" onClick={handleRemoveVoucher} disabled={voucherLoading} className="text-green-700 text-sm hover:underline disabled:opacity-50">
+                      <button type="button" onClick={handleRemoveVoucher} disabled={voucherLoading || processing || order.has_payment_proof} className="text-green-700 text-sm hover:underline disabled:opacity-50">
                         Hapus
                       </button>
                     </div>
@@ -259,7 +254,7 @@ export default function Payment() {
                         placeholder="Masukkan kode voucher"
                         className="input-field text-sm flex-1 uppercase"
                       />
-                      <button type="button" onClick={handleApplyVoucher} disabled={voucherLoading || !voucherCode.trim()} className="px-4 py-2 bg-coffee-900 text-white text-sm rounded-xl hover:bg-coffee-800 disabled:opacity-50 whitespace-nowrap">
+                      <button type="button" onClick={handleApplyVoucher} disabled={voucherLoading || processing || order.has_payment_proof || !voucherCode.trim()} className="px-4 py-2 bg-coffee-900 text-white text-sm rounded-xl hover:bg-coffee-800 disabled:opacity-50 whitespace-nowrap">
                         {voucherLoading ? '...' : 'Pakai'}
                       </button>
                     </div>
@@ -269,26 +264,42 @@ export default function Payment() {
                 </div>
                 <div className="bg-white rounded-2xl p-6">
                   <h3 className="font-semibold text-coffee-900 mb-4 flex items-center gap-2">
-                    <CreditCard size={18} /> Pembayaran Online
+                    <CreditCard size={18} /> Pembayaran QRIS
                   </h3>
                   <p className="text-sm text-coffee-500 mb-4">
-                    Bayar via Midtrans — mendukung QRIS, GoPay, ShopeePay, transfer bank, kartu kredit, dan lainnya.
+                    Scan QRIS menggunakan e-wallet atau mobile banking. Pastikan nama merchant Rahardja Tea, Coffee and serta nominal sesuai.
                   </p>
                   {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
                   <button
-                    onClick={handleMidtransPay}
-                    disabled={processing || !snapReady}
+                    onClick={handleQrisPay}
+                    disabled={processing || voucherLoading}
                     className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {processing ? (
-                      <><Loader2 size={18} className="animate-spin" /> Membuka pembayaran...</>
+                      <><Loader2 size={18} className="animate-spin" /> Membuat QRIS...</>
                     ) : (
-                      <>Bayar {formatPrice(order.total)}</>
+                      <>Buat QRIS {formatPrice(order.qris_amount || order.total)}</>
                     )}
                   </button>
+                  {qrisImage && (
+                    <div className="mt-4 text-center rounded-xl border border-coffee-200 p-4">
+                      <img src={qrisImage} alt={`QRIS pembayaran ${formatPrice(qrisTotal)}`} className="mx-auto w-80 max-w-full" />
+                      <p className="font-semibold text-coffee-900">{formatPrice(qrisTotal)}</p>
+                      <p className="text-sm text-coffee-500 mt-2">Setelah membayar, tunjukkan bukti ke kasir. Pesanan diproses setelah pembayaran dikonfirmasi.</p>
+                      <p className="text-sm text-coffee-600 mt-2">Total belanja {formatPrice(order.total)} + kode unik {String(order.qris_code || 0).padStart(2, '0')} = <strong>{formatPrice(qrisTotal)}</strong>. Bayar persis sesuai nominal QRIS.</p>
+                      {isStaff && <button onClick={handleConfirmQris} disabled={processing || voucherLoading || !order.has_payment_proof} className="btn-primary mt-4 disabled:opacity-50">Konfirmasi Dana QRIS Diterima</button>}
+                    </div>
+                  )}
+                  {order.qris_amount && order.payment_method === 'qris' && (
+                    <>
+                      {!qrisImage && <p className="mt-3 text-sm text-coffee-700">Nominal QRIS: <strong>{formatPrice(order.qris_amount)}</strong> (kode unik {String(order.qris_code).padStart(2, '0')})</p>}
+                      <PaymentProof order={order} onUploaded={(data) => setOrder((previous) => ({ ...previous, ...data }))} />
+                      {isStaff && !qrisImage && <button onClick={handleConfirmQris} disabled={processing || !order.has_payment_proof} className="btn-primary w-full mt-3 disabled:opacity-50">Konfirmasi Dana QRIS Diterima</button>}
+                    </>
+                  )}
                   <button
                     onClick={handleCashPay}
-                    disabled={processing}
+                    disabled={processing || order.has_payment_proof}
                     className="w-full mt-3 flex items-center justify-center gap-2 py-3 border-2 border-coffee-200 rounded-xl text-coffee-700 hover:border-coffee-400 hover:bg-coffee-50 disabled:opacity-50"
                   >
                     <Wallet size={18} />

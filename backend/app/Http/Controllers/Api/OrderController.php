@@ -7,11 +7,13 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\OrderPaymentService;
+use App\Services\QrisService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -42,10 +44,11 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $authUser = $request->user();
+        abort_if($request->input('order_source') === 'pos' && ! $authUser->isCashier() && ! $authUser->isSuperadmin(), 403, 'POS hanya tersedia untuk kasir.');
 
         $rules = [
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'exists:products,id'],
+            'items.*.product_id' => ['required', 'distinct', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string'],
             'table_location' => ['nullable', 'string', 'max:100'],
@@ -56,6 +59,7 @@ class OrderController extends Controller
         $guestPhone = null;
 
         if ($authUser->isSuperadmin() || $authUser->isCashier()) {
+            $rules['order_source'] = ['sometimes', 'in:pos,online'];
             $rules['user_id'] = ['nullable', 'exists:users,id'];
             $rules['guest_name'] = ['nullable', 'string', 'max:255'];
             $rules['guest_phone'] = ['nullable', 'string', 'max:20'];
@@ -67,7 +71,7 @@ class OrderController extends Controller
 
         if ($authUser->isSuperadmin() || $authUser->isCashier()) {
             $staffNote = '[Dipesan oleh: '.$authUser->name.' ('.($authUser->isCashier() ? 'Kasir' : 'Admin').')]';
-            $validated['notes'] = trim($staffNote.($validated['notes'] ? "\n\n".$validated['notes'] : ''));
+            $validated['notes'] = trim($staffNote.(($validated['notes'] ?? null) ? "\n\n".$validated['notes'] : ''));
 
             if (! empty($validated['user_id'])) {
                 $customer = User::find($validated['user_id']);
@@ -88,7 +92,8 @@ class OrderController extends Controller
             $orderItems = [];
 
             foreach ($validated['items'] as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                $product = Product::whereKey($item['product_id'])->lockForUpdate()->firstOrFail();
+                abort_unless($product->is_active, 422, 'Produk tidak aktif.');
 
                 if ($product->stock < $item['quantity']) {
                     abort(422, "Stok {$product->name} tidak mencukupi.");
@@ -112,6 +117,7 @@ class OrderController extends Controller
             $total = max(0, $subtotal - $discount);
 
             $order = Order::create([
+                'order_source' => $validated['order_source'] ?? 'online',
                 'order_number' => 'ORD-'.strtoupper(Str::random(8)),
                 'user_id' => $orderUserId,
                 'guest_name' => $guestName,
@@ -135,8 +141,10 @@ class OrderController extends Controller
         return response()->json($order->load(['items.product']), 201);
     }
 
-    public function show(Order $order): JsonResponse
+    public function show(Request $request, Order $order): JsonResponse
     {
+        abort_unless($this->canAccessOrder($request->user(), $order), 403);
+
         return response()->json($order->load(['user', 'items.product', 'processor']));
     }
 
@@ -231,6 +239,48 @@ class OrderController extends Controller
         return $pdf->download($filename);
     }
 
+    public function qris(Request $request, Order $order, QrisService $qris): JsonResponse
+    {
+        abort_unless($this->canAccessOrder($request->user(), $order), 403);
+        abort_unless($order->status === 'awaiting_payment' && $order->payment_status !== 'paid', 422, 'Pesanan tidak dapat dibayar.');
+        try {
+            $order = $qris->prepare($order);
+            $payload = $qris->payload((string) $order->qris_amount);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['payload' => $payload, 'total' => $order->qris_amount, 'unique_code' => $order->qris_code, 'order' => $order]);
+    }
+
+    public function uploadPaymentProof(Request $request, Order $order): JsonResponse
+    {
+        abort_unless($this->canAccessOrder($request->user(), $order), 403);
+        $request->validate(['proof' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']]);
+
+        return DB::transaction(function () use ($request, $order) {
+            $order = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            abort_unless($order->status === 'awaiting_payment' && $order->payment_method === 'qris' && $order->qris_amount !== null, 422, 'Buat QRIS sebelum mengunggah bukti.');
+            $path = $request->file('proof')->store('payment-proofs', 'local');
+            abort_unless($path, 500, 'Bukti gagal disimpan.');
+            $old = $order->payment_proof_path;
+            $order->update(['payment_proof_path' => $path]);
+            if ($old) {
+                Storage::disk('local')->delete($old);
+            }
+
+            return response()->json($order);
+        });
+    }
+
+    public function paymentProof(Request $request, Order $order)
+    {
+        abort_unless($this->canAccessOrder($request->user(), $order), 403);
+        abort_unless($order->payment_proof_path, 404);
+
+        return Storage::disk('local')->response($order->payment_proof_path, null, ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
+    }
+
     public function processPayment(Request $request, Order $order, OrderPaymentService $paymentService): JsonResponse
     {
         if ($order->status !== 'awaiting_payment') {
@@ -242,18 +292,34 @@ class OrderController extends Controller
         }
 
         $validated = $request->validate([
-            'payment_method' => ['required', 'in:cash'],
+            'payment_method' => ['required', 'in:cash,qris'],
+            'cash_received' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
         ]);
 
         $user = $request->user();
+        abort_if($validated['payment_method'] === 'cash' && $order->has_payment_proof, 422, 'Bukti QRIS sudah dikirim; periksa pembayaran QRIS.');
+        if ($validated['payment_method'] === 'qris' && ($user->isSuperadmin() || $user->isCashier())) {
+            abort_unless($order->qris_amount !== null && ($order->has_payment_proof || $order->order_source === 'pos'), 422, 'Nominal QRIS dan bukti bayar harus tersedia.');
+        }
 
         if ($user->isSuperadmin() || $user->isCashier()) {
-            $order = $paymentService->markAsPaid($order, $validated['payment_method']);
+            if ($order->order_source === 'pos' && $validated['payment_method'] === 'cash') {
+                abort_unless(isset($validated['cash_received']) && (float) $validated['cash_received'] >= (float) $order->total, 422, 'Uang diterima kurang dari total belanja.');
+            }
+            $order = DB::transaction(function () use ($order, $paymentService, $validated) {
+                if ($validated['payment_method'] === 'cash' && isset($validated['cash_received'])) {
+                    $order->update(['cash_received' => $validated['cash_received']]);
+                }
+
+                return $paymentService->markAsPaid($order, $validated['payment_method']);
+            });
 
             return response()->json($order);
         }
 
-        $order->update(['payment_method' => 'cash']);
+        abort_if($validated['payment_method'] === 'qris', 403, 'Pembayaran QRIS harus dikonfirmasi kasir.');
+
+        $order->update(['payment_method' => 'cash', 'qris_slot' => null, 'qris_code' => null, 'qris_amount' => null]);
 
         return response()->json([
             'message' => 'Silakan bayar tunai di kasir.',
@@ -279,6 +345,7 @@ class OrderController extends Controller
             $order->update([
                 'status' => 'cancelled',
                 'payment_status' => 'failed',
+                'qris_slot' => null,
             ]);
         });
 
@@ -306,7 +373,7 @@ class OrderController extends Controller
             }
 
             $updateData = [
-                'status'       => $validated['status'],
+                'status' => $validated['status'],
                 'processed_by' => $request->user()->id,
                 'completed_at' => $validated['status'] === 'completed' ? now() : null,
             ];

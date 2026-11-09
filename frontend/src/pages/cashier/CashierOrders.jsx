@@ -1,9 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Bell, RotateCcw, ChevronRight } from 'lucide-react';
+import { MapPin, Bell, RotateCcw, ChevronRight, QrCode, Wallet } from 'lucide-react';
 import api, { formatPrice } from '../../lib/api';
 import { PAYMENT_LABELS } from '../../lib/paymentMethods';
 import { getOrderCustomerLabel, isWalkInOrder } from '../../lib/orderHelpers';
+import PaymentProof from '../../components/PaymentProof';
 import DashboardLayout from '../../components/DashboardLayout';
 import DownloadReceiptButton from '../../components/DownloadReceiptButton';
 import DownloadCashierTicketButton from '../../components/DownloadCashierTicketButton';
@@ -11,6 +12,7 @@ import DownloadCashierTicketButton from '../../components/DownloadCashierTicketB
 const statuses = ['awaiting_payment', 'pending', 'preparing', 'completed', 'cancelled'];
 const statusLabels = { awaiting_payment: 'Belum Bayar', pending: 'Pending', preparing: 'Disiapkan', completed: 'Selesai', cancelled: 'Batal' };
 const getStatusLabel = (order) => {
+  if (order.status === 'awaiting_payment' && order.payment_method === 'qris') return order.order_source === 'pos' ? 'QRIS POS - Periksa Dana' : order.has_payment_proof ? 'QRIS - Periksa Bukti' : 'QRIS - Menunggu Bukti';
   if (order.status === 'awaiting_payment' && order.payment_method === 'cash') return 'Tunai - Menunggu';
   return statusLabels[order.status];
 };
@@ -119,6 +121,9 @@ export default function CashierOrders() {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState('pending');
   const [loading, setLoading] = useState(true);
+  const [paymentFilter, setPaymentFilter] = useState('all');
+  const [confirming, setConfirming] = useState(null);
+  const [paymentError, setPaymentError] = useState('');
 
   const fetchOrders = useCallback(() => {
     setLoading(true);
@@ -133,6 +138,29 @@ export default function CashierOrders() {
     await api.patch(`/orders/${orderId}/status`, { status });
     fetchOrders();
   };
+
+  const confirmQris = async (order) => {
+    if (!confirm(`Konfirmasi dana QRIS ${formatPrice(order.qris_amount)} untuk ${order.order_number} sudah diterima? Cocokkan bukti dan mutasi pembayaran terlebih dahulu.`)) return;
+    setConfirming(order.id);
+    setPaymentError('');
+    try {
+      await api.post(`/orders/${order.id}/pay`, { payment_method: 'qris' });
+      fetchOrders();
+    } catch (err) {
+      setPaymentError(err.response?.data?.message || 'Gagal mengonfirmasi pembayaran QRIS.');
+    } finally {
+      setConfirming(null);
+    }
+  };
+
+  const paymentTabs = [
+    { id: 'all', label: 'Semua Metode' },
+    { id: 'qris', label: 'QRIS' },
+    { id: 'cash', label: 'Tunai' },
+    { id: 'unselected', label: 'Belum Pilih Metode' },
+  ];
+  const matchesPayment = (order, method) => method === 'all' || (method === 'unselected' ? !order.payment_method : order.payment_method === method);
+  const visibleOrders = orders.filter((order) => matchesPayment(order, paymentFilter));
 
   return (
     <DashboardLayout title="Kelola Pesanan" role="cashier">
@@ -158,16 +186,27 @@ export default function CashierOrders() {
         </button>
       </div>
 
+      <div className="flex gap-2 mb-6 flex-wrap" aria-label="Filter metode pembayaran">
+        {paymentTabs.map((tab) => (
+          <button key={tab.id} onClick={() => setPaymentFilter(tab.id)} aria-pressed={paymentFilter === tab.id}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${paymentFilter === tab.id ? 'bg-coffee-900 border-coffee-900 text-white' : 'bg-white border-coffee-200 text-coffee-700 hover:bg-coffee-100'}`}>
+            {tab.id === 'qris' && <QrCode size={16} />}
+            {tab.id === 'cash' && <Wallet size={16} />}
+            {tab.label} <span className="text-xs opacity-70">({orders.filter((order) => matchesPayment(order, tab.id)).length})</span>
+          </button>
+        ))}
+      </div>
+      {paymentError && <p role="alert" className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{paymentError}</p>}
       {loading ? (
         <div className="flex justify-center py-20">
           <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
         </div>
-      ) : orders.length === 0 ? (
+      ) : visibleOrders.length === 0 ? (
         <p className="text-center text-coffee-500 py-20">Tidak ada pesanan.</p>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => (
-            <div key={order.id} className="bg-white rounded-2xl p-6 shadow-sm">
+          {visibleOrders.map((order) => (
+            <div key={order.id} className={`bg-white rounded-2xl p-6 shadow-sm border-l-4 ${order.payment_method === 'qris' ? 'border-blue-500' : order.payment_method === 'cash' ? 'border-amber-500' : 'border-coffee-200'}`}>
               <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   {/* Queue number badge */}
@@ -179,7 +218,13 @@ export default function CashierOrders() {
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-coffee-900">{order.order_number}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-coffee-900">{order.order_number}</p>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${order.payment_method === 'qris' ? 'bg-blue-50 text-blue-800' : order.payment_method === 'cash' ? 'bg-amber-50 text-amber-800' : 'bg-coffee-50 text-coffee-600'}`}>
+                        {order.payment_method === 'qris' ? <QrCode size={14} /> : order.payment_method === 'cash' ? <Wallet size={14} /> : null}
+                        {PAYMENT_LABELS[order.payment_method] || 'Belum Pilih Metode'}{order.order_source === 'pos' ? ' · POS' : ''}
+                      </span>
+                    </div>
                     <p className="text-sm text-coffee-500">
                       {getOrderCustomerLabel(order)}
                       {isWalkInOrder(order) && (
@@ -212,9 +257,10 @@ export default function CashierOrders() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-between border-t border-coffee-100 pt-4">
+              <div className="flex flex-wrap gap-4 items-center justify-between border-t border-coffee-100 pt-4">
                 <div>
                   <span className="font-semibold">{formatPrice(order.total)}</span>
+                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.order_source === 'pos' ? ' · POS — verifikasi dana' : order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
                   {order.payment_method && <p className="text-xs text-coffee-500 mt-1">{PAYMENT_LABELS[order.payment_method]}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -224,10 +270,16 @@ export default function CashierOrders() {
                       <DownloadCashierTicketButton orderId={order.id} orderNumber={order.order_number} className="!py-1.5 !px-3 !text-xs" />
                     </>
                   )}
-                  {order.status === 'awaiting_payment' && (
-                    <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 bg-orange-600 text-white text-sm rounded-full hover:bg-orange-700">
-                      Terima Bayar
+                  {order.status === 'awaiting_payment' && order.payment_method !== 'qris' && (
+                    <Link to={order.order_source === 'pos' ? `/kasir/pos?order=${order.id}` : `/pembayaran/${order.id}`} className="px-4 py-2 bg-orange-600 text-white text-sm rounded-full hover:bg-orange-700">
+                      {order.payment_method === 'cash' ? 'Terima Bayar Tunai' : 'Pilih Pembayaran'}
                     </Link>
+                  )}
+                  {order.status === 'awaiting_payment' && order.payment_method === 'qris' && (
+                    <button onClick={() => confirmQris(order)} disabled={(!order.has_payment_proof && order.order_source !== 'pos') || !order.qris_amount || confirming !== null}
+                      className="px-4 py-2 bg-blue-700 text-white text-sm rounded-full hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                      {confirming === order.id ? 'Mengonfirmasi...' : 'Konfirmasi QRIS Diterima'}
+                    </button>
                   )}
                   {order.status === 'pending' && (
                     <button onClick={() => updateStatus(order.id, 'preparing')} className="px-4 py-2 bg-blue-600 text-white text-sm rounded-full hover:bg-blue-700">
@@ -246,6 +298,8 @@ export default function CashierOrders() {
                   )}
                 </div>
               </div>
+              {order.payment_method === 'qris' && (order.order_source !== 'pos' || order.has_payment_proof) && <PaymentProof order={order} readOnly />}
+              {order.order_source === 'pos' && order.status === 'awaiting_payment' && <Link to={`/kasir/pos?order=${order.id}`} className="inline-block mt-3 text-sm font-semibold text-blue-700 hover:underline">Buka Transaksi POS</Link>}
             </div>
           ))}
         </div>

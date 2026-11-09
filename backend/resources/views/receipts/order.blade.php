@@ -94,6 +94,10 @@
                 <td class="right">-{{ $formatPrice($order->discount) }}</td>
             </tr>
             @endif
+            @if($order->payment_method === 'qris' && $order->qris_amount)
+            <tr><td>Kode unik QRIS</td><td class="right">{{ $formatPrice($order->qris_amount - $order->total) }}</td></tr>
+            <tr><td>Total dibayar QRIS</td><td class="right">{{ $formatPrice($order->qris_amount) }}</td></tr>
+            @endif
             <tr class="grand">
                 <td>TOTAL</td>
                 <td class="right">{{ $formatPrice($order->total) }}</td>
@@ -101,6 +105,12 @@
         </table>
     </div>
 
+    @if($order->payment_method === 'cash' && $order->cash_received !== null)
+    <div class="totals"><table>
+        <tr><td>Uang diterima</td><td class="right">{{ $formatPrice($order->cash_received) }}</td></tr>
+        <tr><td>Kembalian</td><td class="right">{{ $formatPrice($order->cash_received - $order->total) }}</td></tr>
+    </table></div>
+    @endif
     <div class="paid">LUNAS</div>
 
     @if($order->notes)
