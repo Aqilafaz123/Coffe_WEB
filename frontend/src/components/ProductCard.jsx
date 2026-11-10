@@ -44,37 +44,36 @@ export default function ProductCard({ product }) {
           />
           <button
             onClick={() => setLiked(!liked)}
-            className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-              liked ? 'bg-red-500 text-white' : 'bg-white/90 text-coffee-600 hover:bg-white'
-            }`}
+            className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all ${liked ? 'bg-red-500 text-white' : 'bg-white/90 text-coffee-600 hover:bg-white'
+              }`}
             aria-label="Favorite"
           >
             <Heart size={16} fill={liked ? 'currentColor' : 'none'} />
           </button>
         </div>
-        <div className="p-5">
-          <h3 className="font-display text-lg font-semibold text-coffee-900 mb-1">{product.name}</h3>
-          <p className="text-coffee-500 text-sm mb-4 line-clamp-2">{product.description}</p>
-          <div className="flex items-center justify-between">
-            <span className="text-coffee-900 font-semibold text-lg">{formatPrice(product.price)}</span>
-            <button
-              onClick={handleOrder}
-              className="flex items-center gap-2 bg-coffee-900 text-white text-sm px-4 py-2 rounded-full hover:bg-coffee-800 transition-colors active:scale-95"
-            >
-              <ShoppingBag size={14} />
-              Order
-            </button>
+          <div className="p-4 sm:p-5">
+            <h3 className="font-display text-lg font-semibold text-coffee-900 mb-1">{product.name}</h3>
+            <p className="text-coffee-500 text-sm mb-4 line-clamp-2">{product.description}</p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-coffee-900 font-semibold text-base sm:text-lg whitespace-nowrap">{formatPrice(product.price)}</span>
+                <button
+                  onClick={handleOrder}
+                  className="flex items-center gap-1.5 sm:gap-2 bg-coffee-900 text-white text-sm px-3.5 sm:px-4 py-2 rounded-full hover:bg-coffee-800 transition-colors active:scale-95 shrink-0"
+                >
+                  <ShoppingBag size={14} />
+                  Order
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {showModal && (
-        <OrderConfirmModal
-          product={product}
-          onClose={() => setShowModal(false)}
-          onConfirm={handleConfirm}
-        />
-      )}
-    </>
-  );
+          {showModal && (
+            <OrderConfirmModal
+              product={product}
+              onClose={() => setShowModal(false)}
+              onConfirm={handleConfirm}
+            />
+          )}
+        </>
+        );
 }

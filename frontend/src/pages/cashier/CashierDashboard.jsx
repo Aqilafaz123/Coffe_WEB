@@ -19,24 +19,24 @@ export default function CashierDashboard() {
 
   return (
     <DashboardLayout title="Dashboard Kasir" role="cashier">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((card) => (
-          <div key={card.label} className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 ${card.color} rounded-xl flex items-center justify-center`}>
-                <card.icon size={22} className="text-white" />
-              </div>
-            </div>
-            <p className="text-coffee-500 text-sm">{card.label}</p>
-            <p className="text-2xl font-bold text-coffee-900 mt-1">{card.value}</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {cards.map((card) => (
+                  <div key={card.label} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className={`w-11 h-11 sm:w-12 sm:h-12 ${card.color} rounded-xl flex items-center justify-center`}>
+                        <card.icon size={22} className="text-white" />
+                      </div>
+                    </div>
+                    <p className="text-coffee-500 text-sm">{card.label}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-coffee-900 mt-1 break-words">{card.value}</p>
+                  </div>
         ))}
-      </div>
-      {!stats && (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-        </div>
-      )}
-    </DashboardLayout>
-  );
+                </div>
+                {!stats && (
+                  <div className="flex justify-center py-20">
+                    <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                  </div>
+                )}
+              </DashboardLayout>
+              );
 }

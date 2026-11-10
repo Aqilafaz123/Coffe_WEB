@@ -156,73 +156,77 @@ export default function Payment() {
   };
 
   return (
-    <div className="min-h-screen bg-coffee-50">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-2">Pembayaran</h1>
-          <p className="text-coffee-500 mb-8">Selesaikan pembayaran pesanan Anda</p>
+      <div className="min-h-screen bg-coffee-50 flex flex-col">
+        <Navbar />
+          <div className="flex-1 pt-20 sm:pt-24 pb-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-2">Pembayaran</h1>
+              <p className="text-coffee-500 text-sm sm:text-base mb-6 sm:mb-8">Selesaikan pembayaran pesanan Anda</p>
 
-          {error && !order && <p className="text-red-600 mb-4">{error}</p>}
+              {error && !order && <p className="text-red-600 mb-4">{error}</p>}
 
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-            </div>
-          ) : cashPending && order ? (
-            <div className="text-center py-16 bg-white rounded-2xl max-w-lg mx-auto">
-              <Wallet size={56} className="mx-auto text-amber-600 mb-4" />
-              <h2 className="font-display text-2xl font-bold text-coffee-900 mb-2">Bayar di Kasir</h2>
-              <p className="text-coffee-600 mb-2">Tunjukkan nomor pesanan ini ke kasir:</p>
-              <p className="font-display text-3xl font-bold text-coffee-900 mb-4">{order.order_number}</p>
-              <p className="text-coffee-500 text-sm mb-2">Total: <strong>{formatPrice(order.total)}</strong></p>
-              {order.table_location && (
-                <p className="text-coffee-500 text-sm mb-6">Lokasi: {order.table_location}</p>
-              )}
-              <p className="text-coffee-500 text-sm mb-6">Pesanan akan diproses setelah kasir menerima pembayaran tunai Anda.</p>
-              <button onClick={() => navigate(donePath)} className="btn-primary">Lihat Riwayat</button>
-            </div>
-          ) : paid ? (
-            <div className="text-center py-16 bg-white rounded-2xl">
-              <CheckCircle size={56} className="mx-auto text-green-500 mb-4" />
-              <h2 className="font-display text-2xl font-bold text-coffee-900 mb-2">Pembayaran Berhasil!</h2>
-              <p className="text-coffee-500 mb-6">Pesanan Anda sedang diproses.</p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                {order && (
-                  <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
-                )}
-                {order && isStaff && (
-                  <DownloadCashierTicketButton orderId={order.id} orderNumber={order.order_number} />
-                )}
-                <button onClick={() => navigate(donePath)} className="btn-primary">Lihat Pesanan</button>
-              </div>
-            </div>
-          ) : order && (
-            <div className="grid lg:grid-cols-5 gap-8">
-              <div className="lg:col-span-2 bg-white rounded-2xl p-6 h-fit">
-                <p className="text-sm text-coffee-500 mb-1">No. Pesanan</p>
-                <p className="font-semibold text-coffee-900 mb-2">{order.order_number}</p>
-                {order.table_location && (
-                  <p className="flex items-center gap-2 text-sm text-coffee-700 mb-4 px-3 py-2 bg-coffee-50 rounded-lg">
-                    <MapPin size={14} /> {order.table_location}
-                  </p>
-                )}
-                <div className="space-y-2 mb-4">
-                  {order.items?.map((item) => (
-                    <div key={item.id} className="flex justify-between text-sm text-coffee-600">
-                      <span>{item.product?.name} x{item.quantity}</span>
-                      <span>{formatPrice(item.subtotal)}</span>
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                </div>
+              ) : cashPending && order ? (
+                  <div className="text-center py-12 sm:py-16 px-5 sm:px-8 bg-white rounded-2xl max-w-lg mx-auto shadow-sm">
+                    <Wallet size={56} className="mx-auto text-amber-600 mb-4" />
+                    <h2 className="font-display text-2xl font-bold text-coffee-900 mb-2">Bayar di Kasir</h2>
+                    <p className="text-coffee-600 text-sm sm:text-base mb-2">Tunjukkan nomor pesanan ini ke kasir:</p>
+                    <p className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-4 break-all">{order.order_number}</p>
+                    <p className="text-coffee-500 text-sm mb-2">Total: <strong>{formatPrice(order.total)}</strong></p>
+                    {order.table_location && (
+                      <p className="text-coffee-500 text-sm mb-6">Lokasi: {order.table_location}</p>
+                    )}
+                    <p className="text-coffee-500 text-sm mb-6">Pesanan akan diproses setelah kasir menerima pembayaran tunai Anda.</p>
+                    <button onClick={() => navigate(donePath)} className="btn-primary">Lihat Riwayat</button>
+                  </div>
+                  ) : paid ? (
+                    <div className="text-center py-12 sm:py-16 px-5 sm:px-8 bg-white rounded-2xl shadow-sm">
+                      <CheckCircle size={56} className="mx-auto text-green-500 mb-4" />
+                      <h2 className="font-display text-2xl font-bold text-coffee-900 mb-2">Pembayaran Berhasil!</h2>
+                      <p className="text-coffee-500 mb-6">Pesanan Anda sedang diproses.</p>
+                        <div className="flex flex-wrap gap-3 justify-center items-center">
+                          {order && (
+                            <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
+                          )}
+                          {order && isStaff && (
+                  <DownloadCashierTicketButton
+                    orderId={order.id}
+                    orderNumber={order.order_number}
+                    className="!px-4 !py-2 !text-sm !border-2"
+                  />
+                          )}
+                          <button onClick={() => navigate(donePath)} className="btn-primary !px-5 !py-2 text-sm">Lihat Pesanan</button>
+                        </div>
+                      </div>
+                      ) : order && (
+                          <div className="grid lg:grid-cols-5 gap-6 sm:gap-8">
+                            <div className="lg:col-span-2 bg-white rounded-2xl p-5 sm:p-6 h-fit shadow-sm">
+                              <p className="text-sm text-coffee-500 mb-1">No. Pesanan</p>
+                              <p className="font-semibold text-coffee-900 mb-2 break-all">{order.order_number}</p>
+                              {order.table_location && (
+                                <p className="flex items-center gap-2 text-sm text-coffee-700 mb-4 px-3 py-2 bg-coffee-50 rounded-lg">
+                                  <MapPin size={14} className="shrink-0" /> <span className="break-words">{order.table_location}</span>
+                                </p>
+                              )}
+                              <div className="space-y-2 mb-4">
+                                {order.items?.map((item) => (
+                    <div key={item.id} className="flex justify-between gap-3 text-sm text-coffee-600">
+                      <span className="min-w-0 break-words">{item.product?.name} x{item.quantity}</span>
+                      <span className="shrink-0">{formatPrice(item.subtotal)}</span>
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between text-sm text-coffee-600 mb-2">
+                <div className="flex justify-between gap-2 text-sm text-coffee-600 mb-2">
                   <span>Subtotal</span>
-                  <span>{formatPrice(order.subtotal)}</span>
+                  <span className="shrink-0">{formatPrice(order.subtotal)}</span>
                 </div>
                 {order.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600 mb-2">
-                    <span>Diskon ({order.voucher_code})</span>
-                    <span>-{formatPrice(order.discount)}</span>
+                  <div className="flex justify-between gap-2 text-sm text-green-600 mb-2">
+                    <span className="min-w-0 break-words">Diskon ({order.voucher_code})</span>
+                    <span className="shrink-0">-{formatPrice(order.discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-semibold border-t border-coffee-100 pt-4">
@@ -231,17 +235,17 @@ export default function Payment() {
                 </div>
               </div>
               <div className="lg:col-span-3 space-y-4">
-                <div className="bg-white rounded-2xl p-6">
+                <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
                   <h3 className="font-semibold text-coffee-900 mb-4 flex items-center gap-2">
                     <Tag size={18} /> Voucher Diskon
                   </h3>
                   {order.voucher_code ? (
-                    <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-xl mb-2">
-                      <div>
-                        <p className="font-medium text-green-800 text-sm">{order.voucher_code}</p>
+                    <div className="flex items-center justify-between gap-3 p-3 bg-green-50 border border-green-200 rounded-xl mb-2">
+                      <div className="min-w-0">
+                        <p className="font-medium text-green-800 text-sm truncate">{order.voucher_code}</p>
                         <p className="text-green-600 text-xs">Hemat {formatPrice(order.discount)}</p>
                       </div>
-                      <button type="button" onClick={handleRemoveVoucher} disabled={voucherLoading || processing || order.has_payment_proof} className="text-green-700 text-sm hover:underline disabled:opacity-50">
+                      <button type="button" onClick={handleRemoveVoucher} disabled={voucherLoading || processing || order.has_payment_proof} className="text-green-700 text-sm hover:underline disabled:opacity-50 shrink-0">
                         Hapus
                       </button>
                     </div>
@@ -252,9 +256,9 @@ export default function Payment() {
                         value={voucherCode}
                         onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                         placeholder="Masukkan kode voucher"
-                        className="input-field text-sm flex-1 uppercase"
+                        className="input-field text-sm flex-1 min-w-0 uppercase"
                       />
-                      <button type="button" onClick={handleApplyVoucher} disabled={voucherLoading || processing || order.has_payment_proof || !voucherCode.trim()} className="px-4 py-2 bg-coffee-900 text-white text-sm rounded-xl hover:bg-coffee-800 disabled:opacity-50 whitespace-nowrap">
+                      <button type="button" onClick={handleApplyVoucher} disabled={voucherLoading || processing || order.has_payment_proof || !voucherCode.trim()} className="px-4 py-2 bg-coffee-900 text-white text-sm rounded-xl hover:bg-coffee-800 disabled:opacity-50 whitespace-nowrap shrink-0">
                         {voucherLoading ? '...' : 'Pakai'}
                       </button>
                     </div>
@@ -262,7 +266,7 @@ export default function Payment() {
                   {voucherMsg && <p className={`text-sm mt-2 ${voucherMsg.includes('berhasil') || voucherMsg.includes('dihapus') ? 'text-green-600' : 'text-red-600'}`}>{voucherMsg}</p>}
                   <p className="text-xs text-coffee-400 mt-2">Coba: COFFEE15, HEMAT10K, WELCOME20</p>
                 </div>
-                <div className="bg-white rounded-2xl p-6">
+                <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
                   <h3 className="font-semibold text-coffee-900 mb-4 flex items-center gap-2">
                     <CreditCard size={18} /> Pembayaran QRIS
                   </h3>

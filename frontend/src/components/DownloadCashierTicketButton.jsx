@@ -32,7 +32,7 @@ export default function DownloadCashierTicketButton({ orderId, orderNumber, clas
         onClick={handleDownload}
         disabled={loading}
         title="Cetak Tiket Dapur &amp; Slip Inventory Bahan Baku"
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 border border-amber-300 bg-amber-50 text-amber-900 text-xs font-semibold rounded-full hover:bg-amber-100 disabled:opacity-50 transition-colors shadow-sm ${className}`}
+        className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border border-amber-300 bg-amber-50 text-amber-900 text-xs font-semibold rounded-full hover:bg-amber-100 disabled:opacity-50 transition-colors shadow-sm whitespace-nowrap ${className}`}
       >
         {loading ? <Loader2 size={13} className="animate-spin" /> : <ScrollText size={13} className="text-amber-700" />}
         {loading ? 'Mengunduh...' : 'Tiket Dapur & Inventory'}

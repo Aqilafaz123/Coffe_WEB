@@ -71,125 +71,132 @@ export default function UserHistory() {
   const loading = loadingOrders;
 
   return (
-    <div className="min-h-screen bg-coffee-50">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-2">Riwayat Pesanan</h1>
-          <p className="text-coffee-500 mb-8">Lihat semua riwayat pesanan menu Anda</p>
+      <div className="min-h-screen bg-coffee-50 flex flex-col">
+        <Navbar />
+          <div className="flex-1 pt-20 sm:pt-24 pb-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-2">Riwayat Pesanan</h1>
+              <p className="text-coffee-500 text-sm sm:text-base mb-6 sm:mb-8">Lihat semua riwayat pesanan menu Anda</p>
 
-          {tabs.length > 1 && (
-            <div className="flex gap-2 p-1 bg-white rounded-2xl shadow-sm mb-8">
-              {tabs.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setTab(id)}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                    activeTab === id
-                      ? 'bg-coffee-900 text-white shadow-sm'
-                      : 'text-coffee-600 hover:bg-coffee-50'
-                  }`}
-                >
-                  <Icon size={16} />
-                  <span className="hidden sm:inline">{label}</span>
-                  <span className="sm:hidden">{id === 'pesanan' ? 'Menu' : 'Ruangan'}</span>
-                  {id === 'pesanan' && orders.length > 0 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
-                      {orders.length}
-                    </span>
-                  )}
-                  {id === 'reservasi' && reservations.length > 0 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
-                      {reservations.length}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-            </div>
-          ) : activeTab === 'pesanan' ? (
-            orders.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-2xl">
-                <ShoppingBag size={48} className="mx-auto text-coffee-300 mb-4" />
-                <p className="text-coffee-500 mb-6">Belum ada pesanan menu</p>
-                <Link to="/shop" className="btn-primary">Mulai Belanja</Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {orders.some((o) => ['pending', 'preparing'].includes(o.status)) && (
-                  <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-coffee-900 to-coffee-950 text-white shadow-md border border-coffee-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gold/20 flex items-center justify-center text-gold shrink-0">
-                        <Clock size={22} className="animate-pulse" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-white">Pesanan Anda Sedang Diproses!</h4>
-                        <p className="text-xs text-white/70">Pantau pergerakan antrian pesanan kopi Anda secara live.</p>
-                      </div>
-                    </div>
-                    <Link
-                      to="/pantau-pesanan"
-                      className="w-full sm:w-auto px-5 py-2.5 bg-gold hover:bg-gold/90 text-coffee-950 rounded-xl text-xs font-bold text-center transition-all shadow shrink-0"
+              {tabs.length > 1 && (
+                <div className="flex gap-2 p-1 bg-white rounded-2xl shadow-sm mb-8">
+                  {tabs.map(({ id, label, icon: Icon }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setTab(id)}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === id
+                        ? 'bg-coffee-900 text-white shadow-sm'
+                        : 'text-coffee-600 hover:bg-coffee-50'
+                        }`}
                     >
-                      Buka Papan Pantau ➔
-                    </Link>
-                  </div>
-                )}
-
-                {orders.map((order) => {
-                  const status = order.status === 'awaiting_payment' && order.payment_method === 'cash'
-                    ? { label: 'Bayar di Kasir', color: 'bg-amber-100 text-amber-800', icon: Wallet }
-                    : (orderStatus[order.status] || orderStatus.pending);
-                  const StatusIcon = status.icon;
-                  return (
-                    <div key={order.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                      <div className="flex items-center justify-between mb-4 gap-4">
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <p className="font-semibold text-coffee-900">{order.order_number}</p>
-                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                              🎫 No. Antrian #{String(order.queue_number || order.id).padStart(3, '0')}
-                            </span>
-                          </div>
-                          <p className="text-coffee-500 text-sm">{new Date(order.created_at).toLocaleString('id-ID')}</p>
-                        </div>
-                        <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shrink-0 ${status.color}`}>
-                          <StatusIcon size={14} />
-                          {status.label}
+                      <Icon size={16} />
+                      <span className="hidden sm:inline">{label}</span>
+                      <span className="sm:hidden">{id === 'pesanan' ? 'Menu' : 'Ruangan'}</span>
+                      {id === 'pesanan' && orders.length > 0 && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
+                          {orders.length}
                         </span>
-                      </div>
-                      {order.table_location && (
-                        <p className="flex items-center gap-2 text-sm text-coffee-700 mb-3 px-3 py-2 bg-coffee-50 rounded-lg">
-                          <MapPin size={14} /> {order.table_location}
-                        </p>
                       )}
-                      <div className="space-y-2 mb-4">
-                        {order.items?.map((item) => (
-                          <div key={item.id} className="flex justify-between text-sm text-coffee-600">
-                            <span>{item.product?.name} x{item.quantity}</span>
-                            <span>{formatPrice(item.subtotal)}</span>
+                      {id === 'reservasi' && reservations.length > 0 && (
+                        <span className={`text-xs px-1.5 py-0.5 rounded-full ${activeTab === id ? 'bg-white/20' : 'bg-coffee-100'}`}>
+                          {reservations.length}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                </div>
+              ) : activeTab === 'pesanan' ? (
+                orders.length === 0 ? (
+                  <div className="text-center py-20 bg-white rounded-2xl">
+                    <ShoppingBag size={48} className="mx-auto text-coffee-300 mb-4" />
+                    <p className="text-coffee-500 mb-6">Belum ada pesanan menu</p>
+                    <Link to="/shop" className="btn-primary">Mulai Belanja</Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.some((o) => ['pending', 'preparing'].includes(o.status)) && (
+                      <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-coffee-900 to-coffee-950 text-white shadow-md border border-coffee-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-gold/20 flex items-center justify-center text-gold shrink-0">
+                            <Clock size={22} className="animate-pulse" />
                           </div>
-                        ))}
-                      </div>
-                      {order.discount > 0 && (
-                        <div className="flex justify-between text-sm text-green-600 mb-2">
-                          <span>Diskon ({order.voucher_code})</span>
-                          <span>-{formatPrice(order.discount)}</span>
+                          <div>
+                            <h4 className="font-bold text-sm text-white">Pesanan Anda Sedang Diproses!</h4>
+                            <p className="text-xs text-white/70">Pantau pergerakan antrian pesanan kopi Anda secara live.</p>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex justify-between font-semibold border-t border-coffee-100 pt-4 mb-4">
-                        <span>Total</span>
-                        <span className="text-coffee-900">{formatPrice(order.total)}</span>
-                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
+                        <Link
+                          to="/pantau-pesanan"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-gold hover:bg-gold/90 text-coffee-950 rounded-xl text-xs font-bold text-center transition-all shadow shrink-0"
+                        >
+                          Buka Papan Pantau ➔
+                        </Link>
                       </div>
-                      {canDownloadReceipt(order) && (
-                        <p className="text-coffee-500 text-sm mb-3">
+                    )}
+
+                    {orders.map((order) => {
+                      const status = order.status === 'awaiting_payment' && order.payment_method === 'cash'
+                        ? { label: 'Bayar di Kasir', color: 'bg-amber-100 text-amber-800', icon: Wallet }
+                        : (orderStatus[order.status] || orderStatus.pending);
+                      const StatusIcon = status.icon;
+                      return (
+                              <div key={order.id} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+                                <div className="flex flex-wrap sm:flex-nowrap items-start justify-between mb-4 gap-2 sm:gap-4">
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                                        <p className="font-semibold text-coffee-900 break-all">{order.order_number}</p>
+                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 whitespace-nowrap">
+                                          🎫 No. Antrian #{String(order.queue_number || order.id).padStart(3, '0')}
+                                        </span>
+                                    </div>
+                                    <p className="text-coffee-500 text-xs sm:text-sm">{new Date(order.created_at).toLocaleString('id-ID')}</p>
+                                  </div>
+                                  <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shrink-0 ${status.color}`}>
+                                    <StatusIcon size={14} />
+                                    {status.label}
+                                  </span>
+                                </div>
+                                {order.table_location && (
+                                  <p className="flex items-center gap-2 text-sm text-coffee-700 mb-3 px-3 py-2 bg-coffee-50 rounded-lg">
+                                    <MapPin size={14} className="shrink-0" /> <span className="break-words">{order.table_location}</span>
+                                  </p>
+                                )}
+                                <div className="space-y-2 mb-4">
+                                  {order.items?.map((item) => (
+                                      <div key={item.id} className="flex justify-between gap-3 text-sm text-coffee-600">
+                                        <span className="min-w-0 break-words">{item.product?.name} x{item.quantity}</span>
+                                        <span className="shrink-0">{formatPrice(item.subtotal)}</span>
+                                      </div>
+                        ))}
+                                    </div>
+                      {
+                                      order.discount > 0 && (
+                                          <div className="flex justify-between gap-2 text-sm text-green-600 mb-2">
+                                            <span className="min-w-0 break-words">Diskon ({order.voucher_code})</span>
+                                            <span className="shrink-0">-{formatPrice(order.discount)}</span>
+                                          </div>
+                      )}
+                                            <div className="border-t border-coffee-100 pt-4 mb-4">
+                                              <div className="flex justify-between font-semibold">
+                                                <span>Total</span>
+                                                <span className="text-coffee-900">{formatPrice(order.total)}</span>
+                                              </div>
+                                              {order.payment_method === 'qris' && order.qris_amount && (
+                                                <p className="text-sm text-coffee-700 mt-1 break-words">
+                                                  QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}
+                                                  {order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}
+                                                </p>
+                                              )}
+                                            </div>
+                                            {canDownloadReceipt(order) && (
+                        <p className="text-coffee-500 text-xs sm:text-sm mb-3">
                           {order.payment_method && (
                             <>Bayar via {PAYMENT_LABELS[order.payment_method] || order.payment_method}</>
                           )}
@@ -200,23 +207,23 @@ export default function UserHistory() {
                           )}
                         </p>
                       )}
-                      <div className="flex flex-wrap gap-3 items-center pt-1 border-t border-coffee-100">
+                      <div className="flex flex-wrap gap-2.5 sm:gap-3 items-center pt-3 border-t border-coffee-100">
                         {/* Pantau Antrian Button */}
                         <Link
                           to={`/antrian/${order.id}`}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-coffee-900 text-white text-xs sm:text-sm font-semibold rounded-full hover:bg-coffee-800 transition-all shadow-sm active:scale-95"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-coffee-900 text-white text-xs sm:text-sm font-semibold rounded-full hover:bg-coffee-800 transition-all shadow-sm active:scale-95 whitespace-nowrap"
                         >
                           <Clock size={14} />
                           Pantau Antrian
                         </Link>
 
                         {order.status === 'awaiting_payment' && order.payment_method === 'cash' && (
-                          <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 border-2 border-amber-300 text-amber-800 text-xs sm:text-sm rounded-full hover:bg-amber-50">
+                          <Link to={`/pembayaran/${order.id}`} className="px-4 py-2 border-2 border-amber-300 text-amber-800 text-xs sm:text-sm rounded-full hover:bg-amber-50 whitespace-nowrap">
                             Lihat Instruksi Bayar
                           </Link>
                         )}
                         {order.status === 'awaiting_payment' && order.payment_method !== 'cash' && (
-                          <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block text-xs sm:text-sm">
+                          <Link to={`/pembayaran/${order.id}`} className="btn-primary !px-4 !py-2 inline-block text-xs sm:text-sm whitespace-nowrap">
                             Bayar Sekarang
                           </Link>
                         )}
@@ -224,7 +231,8 @@ export default function UserHistory() {
                           <DownloadReceiptButton
                             orderId={order.id}
                             orderNumber={order.order_number}
-                            className="!border-coffee-900 !text-coffee-900 hover:!bg-coffee-900 hover:!text-white"
+                            size="sm"
+                            className="!border-coffee-900 !text-coffee-900 hover:!bg-coffee-900 hover:!text-white !text-xs sm:!text-sm"
                           />
                         )}
                       </div>
@@ -285,5 +293,5 @@ export default function UserHistory() {
       </div>
       <Footer />
     </div>
-  );
+                                          );
 }

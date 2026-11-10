@@ -23,44 +23,44 @@ export default function Orders() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-coffee-50">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-8">Pesanan Saya</h1>
+      <div className="min-h-screen bg-coffee-50 flex flex-col">
+        <Navbar />
+          <div className="flex-1 pt-20 sm:pt-24 pb-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-6 sm:mb-8">Pesanan Saya</h1>
 
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-            </div>
-          ) : orders.length === 0 ? (
-            <div className="text-center py-20">
-              <Package size={48} className="mx-auto text-coffee-300 mb-4" />
-              <p className="text-coffee-500 mb-6">Belum ada pesanan</p>
-              <Link to="/shop" className="btn-primary">Mulai Belanja</Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {orders.map((order) => {
-                const status = statusConfig[order.status];
-                const StatusIcon = status.icon;
-                return (
-                  <div key={order.id} className="bg-white rounded-2xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="font-semibold text-coffee-900">{order.order_number}</p>
-                        <p className="text-coffee-500 text-sm">{new Date(order.created_at).toLocaleString('id-ID')}</p>
-                      </div>
-                      <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${status.color}`}>
-                        <StatusIcon size={14} />
-                        {status.label}
-                      </span>
-                    </div>
-                    <div className="space-y-2 mb-4">
-                      {order.items?.map((item) => (
-                        <div key={item.id} className="flex justify-between text-sm text-coffee-600">
-                          <span>{item.product?.name} x{item.quantity}</span>
-                          <span>{formatPrice(item.subtotal)}</span>
+              {loading ? (
+                <div className="flex justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="text-center py-20">
+                  <Package size={48} className="mx-auto text-coffee-300 mb-4" />
+                  <p className="text-coffee-500 mb-6">Belum ada pesanan</p>
+                  <Link to="/shop" className="btn-primary inline-block">Mulai Belanja</Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((order) => {
+                    const status = statusConfig[order.status];
+                    const StatusIcon = status.icon;
+                    return (
+                            <div key={order.id} className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+                              <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-4 mb-4">
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-coffee-900 break-all">{order.order_number}</p>
+                                  <p className="text-coffee-500 text-xs sm:text-sm">{new Date(order.created_at).toLocaleString('id-ID')}</p>
+                                </div>
+                                  <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shrink-0 ${status.color}`}>
+                                    <StatusIcon size={14} />
+                                    {status.label}
+                                  </span>
+                              </div>
+                              <div className="space-y-2 mb-4">
+                                {order.items?.map((item) => (
+                        <div key={item.id} className="flex justify-between gap-3 text-sm text-coffee-600">
+                          <span className="min-w-0 break-words">{item.product?.name} x{item.quantity}</span>
+                          <span className="shrink-0">{formatPrice(item.subtotal)}</span>
                         </div>
                       ))}
                     </div>
@@ -68,20 +68,24 @@ export default function Orders() {
                       <span>Total</span>
                       <span className="text-coffee-900">{formatPrice(order.total)}</span>
                     </div>
-                    {order.payment_method && (
-                      <p className="text-coffee-500 text-sm mb-3">Bayar via {PAYMENT_LABELS[order.payment_method] || order.payment_method}</p>
-                    )}
-                    {order.status === 'awaiting_payment' && (
-                      <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block text-sm">Bayar Sekarang</Link>
-                    )}
+                    {
+                                    order.payment_method && (
+                                      <p className="text-coffee-500 text-sm mb-3">Bayar via {PAYMENT_LABELS[order.payment_method] || order.payment_method}</p>
+                                    )
+                                  }
+                    {
+                                    order.status === 'awaiting_payment' && (
+                                      <Link to={`/pembayaran/${order.id}`} className="btn-primary inline-block text-sm">Bayar Sekarang</Link>
+                                    )
+                                  }
                   </div>
-                );
+                              );
               })}
-            </div>
+                            </div>
           )}
-        </div>
-      </div>
-      <Footer />
-    </div>
-  );
-}
+                          </div>
+                        </div>
+                        <Footer />
+                      </div>
+                    );
+                  }

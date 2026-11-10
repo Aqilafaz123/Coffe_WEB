@@ -31,7 +31,7 @@ export default function DownloadReceiptButton({ orderId, orderNumber, className 
         type="button"
         onClick={handleDownload}
         disabled={loading}
-        className={`inline-flex items-center gap-2 px-4 py-2 border-2 border-coffee-200 text-coffee-800 text-sm rounded-full hover:border-coffee-400 hover:bg-coffee-50 disabled:opacity-50 transition-colors ${className}`}
+        className={`inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-coffee-200 text-coffee-800 text-sm rounded-full hover:border-coffee-400 hover:bg-coffee-50 disabled:opacity-50 transition-colors whitespace-nowrap ${className}`}
       >
         {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
         {loading ? 'Mengunduh...' : 'Download Struk'}

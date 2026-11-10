@@ -59,23 +59,29 @@ function QueuePanel({ onOrdersRefresh }) {
   if (!queueData) return null;
 
   return (
-    <div className="rounded-2xl p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+    <div className="rounded-2xl p-4 sm:p-5 mb-6 flex flex-col sm:flex-row sm:items-center gap-4"
       style={{ background: 'linear-gradient(135deg, #081b56 0%, #193a8d 100%)', boxShadow: '0 8px 24px rgba(8,27,86,0.2)' }}>
 
       {/* Currently called */}
-      <div className="flex items-center gap-4 flex-1">
-        <div className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center shrink-0"
+      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center shrink-0"
           style={{ background: 'rgba(201,162,39,0.2)', border: '1px solid rgba(201,162,39,0.4)' }}>
           <span className="text-xs font-semibold" style={{ color: 'rgba(201,162,39,0.7)' }}>#</span>
-          <span className="font-display text-2xl font-bold leading-none" style={{ color: '#c9a227' }}>
+          <span className="font-display text-xl sm:text-2xl font-bold leading-none" style={{ color: '#c9a227' }}>
             {queueData.current_called > 0 ? queueData.current_called : '-'}
           </span>
         </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest mb-0.5" style={{ color: 'rgba(201,162,39,0.7)' }}>
-            Antrian Dipanggil
-          </p>
-          <p className="text-white font-semibold">
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(201,162,39,0.7)' }}>
+              Antrian Dipanggil
+            </p>
+            <span className="sm:hidden px-2 py-0.5 rounded-full text-[11px] font-medium"
+              style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)' }}>
+              {queueData.orders?.filter(o => !o.is_called).length ?? 0} menunggu
+            </span>
+          </div>
+          <p className="text-white font-semibold truncate">
             {queueData.current_called > 0 ? `Nomor #${queueData.current_called}` : 'Belum ada yang dipanggil'}
           </p>
           {queueData.next_queue && (
@@ -87,31 +93,33 @@ function QueuePanel({ onOrdersRefresh }) {
       </div>
 
       {/* Waiting count badge */}
-      <div className="px-3 py-1.5 rounded-full text-xs font-medium hidden sm:block"
+      <div className="px-3 py-1.5 rounded-full text-xs font-medium hidden sm:block shrink-0"
         style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
         {queueData.orders?.filter(o => !o.is_called).length ?? 0} menunggu
       </div>
 
-      {/* Manual refresh button */}
-      <button
-        onClick={fetchQueue}
-        title="Segarkan Antrian"
-        className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all active:scale-95"
-      >
-        <RotateCcw size={16} />
-      </button>
+      <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+        {/* Manual refresh button */}
+        <button
+          onClick={fetchQueue}
+          title="Segarkan Antrian"
+          className="p-3 rounded-xl bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all active:scale-95 shrink-0"
+        >
+          <RotateCcw size={16} />
+        </button>
 
-      {/* Call next button */}
-      <button
-        onClick={callNext}
-        disabled={calling || !queueData.next_queue}
-        className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm transition-all active:scale-95 disabled:opacity-40"
-        style={{ background: '#c9a227', color: '#1a0f0a', boxShadow: '0 4px 14px rgba(201,162,39,0.4)' }}
-      >
-        <Bell size={16} />
-        {calling ? 'Memanggil...' : queueData.next_queue ? `Panggil #${queueData.next_queue}` : 'Tidak Ada Antrian'}
-        {!calling && queueData.next_queue && <ChevronRight size={15} />}
-      </button>
+        {/* Call next button */}
+        <button
+          onClick={callNext}
+          disabled={calling || !queueData.next_queue}
+          className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-3 rounded-xl font-semibold text-sm transition-all active:scale-95 disabled:opacity-40 whitespace-nowrap"
+          style={{ background: '#c9a227', color: '#1a0f0a', boxShadow: '0 4px 14px rgba(201,162,39,0.4)' }}
+        >
+          <Bell size={16} />
+          {calling ? 'Memanggil...' : queueData.next_queue ? `Panggil #${queueData.next_queue}` : 'Tidak Ada Antrian'}
+          {!calling && queueData.next_queue && <ChevronRight size={15} />}
+        </button>
+      </div>
     </div>
   );
 }
@@ -169,19 +177,19 @@ export default function CashierOrders() {
       <QueuePanel onOrdersRefresh={fetchOrders} />
 
       {/* Status Filter */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-2 mb-4 sm:mb-6 flex-wrap">
         {statuses.map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
               filter === s ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-700 hover:bg-coffee-100'
             }`}
           >
             {statusLabels[s]}
           </button>
         ))}
-        <button onClick={fetchOrders} className="px-3 py-2 rounded-full text-sm bg-white text-coffee-500 hover:bg-coffee-100 transition-colors" title="Refresh">
+        <button onClick={fetchOrders} className="px-3 py-1.5 sm:py-2 rounded-full text-sm bg-white text-coffee-500 hover:bg-coffee-100 transition-colors" title="Refresh">
           <RotateCcw size={15} />
         </button>
       </div>
@@ -189,9 +197,9 @@ export default function CashierOrders() {
       <div className="flex gap-2 mb-6 flex-wrap" aria-label="Filter metode pembayaran">
         {paymentTabs.map((tab) => (
           <button key={tab.id} onClick={() => setPaymentFilter(tab.id)} aria-pressed={paymentFilter === tab.id}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${paymentFilter === tab.id ? 'bg-coffee-900 border-coffee-900 text-white' : 'bg-white border-coffee-200 text-coffee-700 hover:bg-coffee-100'}`}>
-            {tab.id === 'qris' && <QrCode size={16} />}
-            {tab.id === 'cash' && <Wallet size={16} />}
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-colors ${paymentFilter === tab.id ? 'bg-coffee-900 border-coffee-900 text-white' : 'bg-white border-coffee-200 text-coffee-700 hover:bg-coffee-100'}`}>
+            {tab.id === 'qris' && <QrCode size={15} />}
+            {tab.id === 'cash' && <Wallet size={15} />}
             {tab.label} <span className="text-xs opacity-70">({orders.filter((order) => matchesPayment(order, tab.id)).length})</span>
           </button>
         ))}
@@ -206,9 +214,9 @@ export default function CashierOrders() {
       ) : (
         <div className="space-y-4">
           {visibleOrders.map((order) => (
-            <div key={order.id} className={`bg-white rounded-2xl p-6 shadow-sm border-l-4 ${order.payment_method === 'qris' ? 'border-blue-500' : order.payment_method === 'cash' ? 'border-amber-500' : 'border-coffee-200'}`}>
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                <div className="flex items-center gap-3">
+            <div key={order.id} className={`bg-white rounded-2xl p-4 sm:p-6 shadow-sm border-l-4 ${order.payment_method === 'qris' ? 'border-blue-500' : order.payment_method === 'cash' ? 'border-amber-500' : 'border-coffee-200'}`}>
+              <div className="flex flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4">
+                <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
                   {/* Queue number badge */}
                   {order.queue_number && (
                     <div className="w-10 h-10 rounded-xl flex flex-col items-center justify-center shrink-0"
@@ -217,15 +225,15 @@ export default function CashierOrders() {
                       <span className="font-bold text-sm leading-tight" style={{ color: '#081b56' }}>{order.queue_number}</span>
                     </div>
                   )}
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-coffee-900">{order.order_number}</p>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${order.payment_method === 'qris' ? 'bg-blue-50 text-blue-800' : order.payment_method === 'cash' ? 'bg-amber-50 text-amber-800' : 'bg-coffee-50 text-coffee-600'}`}>
+                      <p className="font-semibold text-coffee-900 break-words">{order.order_number}</p>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-semibold ${order.payment_method === 'qris' ? 'bg-blue-50 text-blue-800' : order.payment_method === 'cash' ? 'bg-amber-50 text-amber-800' : 'bg-coffee-50 text-coffee-600'}`}>
                         {order.payment_method === 'qris' ? <QrCode size={14} /> : order.payment_method === 'cash' ? <Wallet size={14} /> : null}
                         {PAYMENT_LABELS[order.payment_method] || 'Belum Pilih Metode'}{order.order_source === 'pos' ? ' · POS' : ''}
                       </span>
                     </div>
-                    <p className="text-sm text-coffee-500">
+                    <p className="text-xs sm:text-sm text-coffee-500 break-words mt-0.5">
                       {getOrderCustomerLabel(order)}
                       {isWalkInOrder(order) && (
                         <span className="ml-1.5 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full">Walk-in</span>
@@ -235,7 +243,7 @@ export default function CashierOrders() {
                     </p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                <span className={`px-3 py-1 rounded-full text-xs font-medium shrink-0 ${
                   order.payment_method === 'cash' && order.status === 'awaiting_payment'
                     ? 'bg-amber-100 text-amber-800'
                     : statusColors[order.status]
@@ -244,23 +252,23 @@ export default function CashierOrders() {
                 </span>
               </div>
               {order.table_location && (
-                <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-coffee-900 text-white rounded-xl">
+                <div className="flex items-center gap-2 mb-4 px-3.5 sm:px-4 py-2.5 bg-coffee-900 text-white rounded-xl">
                   <MapPin size={16} className="shrink-0" />
-                  <span className="text-sm font-semibold">Antar ke: {order.table_location}</span>
+                  <span className="text-sm font-semibold break-words">Antar ke: {order.table_location}</span>
                 </div>
               )}
-              <div className="space-y-1 mb-4">
+              <div className="space-y-1.5 mb-4">
                 {order.items?.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm text-coffee-600">
-                    <span>{item.product?.name} x{item.quantity}</span>
-                    <span>{formatPrice(item.subtotal)}</span>
+                  <div key={item.id} className="flex justify-between gap-3 text-sm text-coffee-600">
+                    <span className="min-w-0 break-words">{item.product?.name} x{item.quantity}</span>
+                    <span className="shrink-0">{formatPrice(item.subtotal)}</span>
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-4 items-center justify-between border-t border-coffee-100 pt-4">
-                <div>
+              <div className="flex flex-wrap gap-3 sm:gap-4 items-center justify-between border-t border-coffee-100 pt-4">
+                <div className="min-w-0">
                   <span className="font-semibold">{formatPrice(order.total)}</span>
-                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.order_source === 'pos' ? ' · POS — verifikasi dana' : order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
+                  {order.payment_method === 'qris' && order.qris_amount && <p className="text-sm text-coffee-700 mt-1 break-words">QRIS: <strong>{formatPrice(order.qris_amount)}</strong> · Kode {String(order.qris_code).padStart(2, '0')}{order.order_source === 'pos' ? ' · POS — verifikasi dana' : order.has_payment_proof ? ' · Bukti terkirim' : ' · Belum ada bukti'}</p>}
                   {order.payment_method && <p className="text-xs text-coffee-500 mt-1">{PAYMENT_LABELS[order.payment_method]}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2 items-center">
@@ -271,28 +279,28 @@ export default function CashierOrders() {
                     </>
                   )}
                   {order.status === 'awaiting_payment' && order.payment_method !== 'qris' && (
-                    <Link to={order.order_source === 'pos' ? `/kasir/pos?order=${order.id}` : `/pembayaran/${order.id}`} className="px-4 py-2 bg-orange-600 text-white text-sm rounded-full hover:bg-orange-700">
+                    <Link to={order.order_source === 'pos' ? `/kasir/pos?order=${order.id}` : `/pembayaran/${order.id}`} className="px-4 py-2 bg-orange-600 text-white text-xs sm:text-sm rounded-full hover:bg-orange-700">
                       {order.payment_method === 'cash' ? 'Terima Bayar Tunai' : 'Pilih Pembayaran'}
                     </Link>
                   )}
                   {order.status === 'awaiting_payment' && order.payment_method === 'qris' && (
                     <button onClick={() => confirmQris(order)} disabled={(!order.has_payment_proof && order.order_source !== 'pos') || !order.qris_amount || confirming !== null}
-                      className="px-4 py-2 bg-blue-700 text-white text-sm rounded-full hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                      className="px-4 py-2 bg-blue-700 text-white text-xs sm:text-sm rounded-full hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed">
                       {confirming === order.id ? 'Mengonfirmasi...' : 'Konfirmasi QRIS Diterima'}
                     </button>
                   )}
                   {order.status === 'pending' && (
-                    <button onClick={() => updateStatus(order.id, 'preparing')} className="px-4 py-2 bg-blue-600 text-white text-sm rounded-full hover:bg-blue-700">
+                    <button onClick={() => updateStatus(order.id, 'preparing')} className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-full hover:bg-blue-700">
                       Mulai Siapkan
                     </button>
                   )}
                   {order.status === 'preparing' && (
-                    <button onClick={() => updateStatus(order.id, 'completed')} className="px-4 py-2 bg-green-600 text-white text-sm rounded-full hover:bg-green-700">
+                    <button onClick={() => updateStatus(order.id, 'completed')} className="px-4 py-2 bg-green-600 text-white text-xs sm:text-sm rounded-full hover:bg-green-700">
                       Selesai
                     </button>
                   )}
                   {['pending', 'preparing'].includes(order.status) && (
-                    <button onClick={() => updateStatus(order.id, 'cancelled')} className="px-4 py-2 bg-red-100 text-red-700 text-sm rounded-full hover:bg-red-200">
+                    <button onClick={() => updateStatus(order.id, 'cancelled')} className="px-4 py-2 bg-red-100 text-red-700 text-xs sm:text-sm rounded-full hover:bg-red-200">
                       Batalkan
                     </button>
                   )}

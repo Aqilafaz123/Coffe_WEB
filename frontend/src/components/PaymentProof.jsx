@@ -46,18 +46,18 @@ export default function PaymentProof({ order, onUploaded, readOnly = false }) {
   };
 
   return (
-    <div className="mt-4 border border-coffee-200 rounded-xl p-4 text-left">
-      <h4 className="font-semibold text-coffee-900 mb-2">Bukti Pembayaran QRIS</h4>
-      {order.has_payment_proof && <p className="text-sm text-green-700 mb-2">{order.payment_status === 'paid' ? 'Pembayaran sudah dikonfirmasi.' : 'Bukti terkirim — menunggu verifikasi kasir.'}</p>}
-      {readOnly && !order.has_payment_proof && <p className="text-sm text-coffee-500">Pelanggan belum mengunggah bukti bayar.</p>}
-      {order.has_payment_proof && !image && !error && <p className="text-sm text-coffee-500" role="status">Memuat bukti bayar...</p>}
-      {image && <a href={image} target="_blank" rel="noreferrer"><img src={image} alt="Bukti pembayaran QRIS" className="max-h-80 max-w-full rounded-lg mx-auto mb-3" /></a>}
-      {!readOnly && <form onSubmit={upload}>
-        <label className="block text-sm text-coffee-600 mb-2" htmlFor="payment-proof">Upload foto atau screenshot bukti bayar (JPG, PNG, WebP; maks. 2 MB)</label>
-        <input id="payment-proof" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full text-sm mb-3" />
-        <button disabled={busy || !file} className="btn-primary w-full disabled:opacity-50">{busy ? 'Mengunggah...' : order.has_payment_proof ? 'Ganti Bukti Bayar' : 'Kirim Bukti Bayar'}</button>
-      </form>}
-      {error && <p className="text-red-600 text-sm mt-2" role="alert">{error}</p>}
-    </div>
-  );
+      <div className="mt-4 border border-coffee-200 rounded-xl p-3.5 sm:p-4 text-left">
+        <h4 className="font-semibold text-coffee-900 mb-2">Bukti Pembayaran QRIS</h4>
+        {order.has_payment_proof && <p className="text-sm text-green-700 mb-2">{order.payment_status === 'paid' ? 'Pembayaran sudah dikonfirmasi.' : 'Bukti terkirim — menunggu verifikasi kasir.'}</p>}
+        {readOnly && !order.has_payment_proof && <p className="text-sm text-coffee-500">Pelanggan belum mengunggah bukti bayar.</p>}
+        {order.has_payment_proof && !image && !error && <p className="text-sm text-coffee-500" role="status">Memuat bukti bayar...</p>}
+        {image && <a href={image} target="_blank" rel="noreferrer"><img src={image} alt="Bukti pembayaran QRIS" className="max-h-80 max-w-full rounded-lg mx-auto mb-3" /></a>}
+        {!readOnly && <form onSubmit={upload}>
+          <label className="block text-sm text-coffee-600 mb-2" htmlFor="payment-proof">Upload foto atau screenshot bukti bayar (JPG, PNG, WebP; maks. 2 MB)</label>
+          <input id="payment-proof" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={(e) => setFile(e.target.files?.[0] || null)} className="block w-full max-w-full text-sm mb-3 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-coffee-100 file:text-coffee-900 hover:file:bg-coffee-200" />
+          <button disabled={busy || !file} className="btn-primary w-full disabled:opacity-50">{busy ? 'Mengunggah...' : order.has_payment_proof ? 'Ganti Bukti Bayar' : 'Kirim Bukti Bayar'}</button>
+        </form>}
+        {error && <p className="text-red-600 text-sm mt-2" role="alert">{error}</p>}
+      </div>
+      );
 }

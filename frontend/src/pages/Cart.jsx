@@ -58,50 +58,52 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-coffee-50">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="font-display text-3xl font-bold text-coffee-900 mb-2">
-            {isStaff ? 'Pesan untuk Pelanggan' : 'Keranjang Belanja'}
-          </h1>
-          {isStaff && (
-            <p className="text-coffee-500 text-sm mb-8">Buat pesanan atas nama pelanggan</p>
-          )}
-          {!isStaff && <div className="mb-8" />}
+      <div className="min-h-screen bg-coffee-50 flex flex-col">
+        <Navbar />
+          <div className="flex-1 pt-20 sm:pt-24 pb-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-2">
+                  {isStaff ? 'Pesan untuk Pelanggan' : 'Keranjang Belanja'}
+                </h1>
+                {isStaff && (
+            <p className="text-coffee-500 text-sm mb-6 sm:mb-8">Buat pesanan atas nama pelanggan</p>
+                )}
+                {!isStaff && <div className="mb-6 sm:mb-8" />}
 
-          {items.length === 0 ? (
-            <div className="text-center py-20">
-              <ShoppingBag size={48} className="mx-auto text-coffee-300 mb-4" />
-              <p className="text-coffee-500 mb-6">Keranjang kosong</p>
-              <Link to="/shop" className="btn-primary">Mulai Belanja</Link>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="md:col-span-2 space-y-4">
-                {items.map((item) => {
-                  const { product, quantity, notes: itemNotes } = item;
-                  const cartKey = getCartKey(item);
-                  return (
-                    <div key={cartKey} className="bg-white rounded-2xl p-4">
-                      <div className="flex gap-4 items-center">
-                        <img src={product.image} alt={product.name} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                {items.length === 0 ? (
+                  <div className="text-center py-20">
+                    <ShoppingBag size={48} className="mx-auto text-coffee-300 mb-4" />
+                    <p className="text-coffee-500 mb-6">Keranjang kosong</p>
+                    <Link to="/shop" className="btn-primary inline-block">Mulai Belanja</Link>
+                  </div>
+                ) : (
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                        <div className="lg:col-span-2 space-y-4">
+                          {items.map((item) => {
+                            const { product, quantity, notes: itemNotes } = item;
+                            const cartKey = getCartKey(item);
+                            return (
+                    <div key={cartKey} className="bg-white rounded-2xl p-4 shadow-sm">
+                      <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:gap-4 items-center">
+                        <img src={product.image} alt={product.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-coffee-900">{product.name}</h3>
+                          <h3 className="font-semibold text-coffee-900 break-words">{product.name}</h3>
                           <p className="text-coffee-500 text-sm">{formatPrice(product.price)}</p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button onClick={() => updateQuantity(cartKey, quantity - 1)} className="w-8 h-8 rounded-full bg-coffee-100 flex items-center justify-center hover:bg-coffee-200">
-                            <Minus size={14} />
-                          </button>
-                          <span className="w-8 text-center font-medium">{quantity}</span>
-                          <button onClick={() => updateQuantity(cartKey, quantity + 1)} className="w-8 h-8 rounded-full bg-coffee-100 flex items-center justify-center hover:bg-coffee-200">
-                            <Plus size={14} />
+                        <div className="flex items-center gap-2 shrink-0 ml-auto">
+                          <div className="flex items-center gap-1.5 sm:gap-2">
+                            <button onClick={() => updateQuantity(cartKey, quantity - 1)} className="w-8 h-8 rounded-full bg-coffee-100 flex items-center justify-center hover:bg-coffee-200" aria-label={`Kurangi ${product.name}`}>
+                              <Minus size={14} />
+                            </button>
+                            <span className="w-7 text-center font-medium text-sm sm:text-base">{quantity}</span>
+                            <button onClick={() => updateQuantity(cartKey, quantity + 1)} className="w-8 h-8 rounded-full bg-coffee-100 flex items-center justify-center hover:bg-coffee-200" aria-label={`Tambah ${product.name}`}>
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                          <button onClick={() => removeItem(cartKey)} className="text-red-400 hover:text-red-600 p-2 shrink-0" aria-label={`Hapus ${product.name}`}>
+                            <Trash2 size={18} />
                           </button>
                         </div>
-                        <button onClick={() => removeItem(cartKey)} className="text-red-400 hover:text-red-600 p-2 shrink-0">
-                          <Trash2 size={18} />
-                        </button>
                       </div>
                       <input
                         type="text"
@@ -115,7 +117,7 @@ export default function Cart() {
                 })}
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden md:sticky md:top-24 h-fit">
+              <div className="bg-white rounded-2xl shadow-sm overflow-hidden lg:sticky lg:top-24 h-fit">
                 {isStaff && (
                   <div className="p-5">
                     <CustomerSelect value={orderForUser} onChange={setOrderForUser} />
@@ -147,5 +149,5 @@ export default function Cart() {
       </div>
       <Footer />
     </div>
-  );
+                        );
 }

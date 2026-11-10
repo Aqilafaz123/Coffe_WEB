@@ -40,141 +40,188 @@ export default function LogisticsMutations() {
     <DashboardLayout title="Riwayat Mutasi Stok Bahan Baku" role={role}>
       <div className="space-y-6">
         {/* Filter Controls */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-coffee-600">
-              <SlidersHorizontal size={14} /> Filter:
-            </div>
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-coffee-600 shrink-0">
+                    <SlidersHorizontal size={14} /> Filter:
+                  </div>
 
-            {/* Type buttons */}
-            <div className="flex gap-1.5">
-              {[
-                { id: '', label: 'Semua Mutasi' },
-                { id: 'in', label: 'Masuk (+)' },
-                { id: 'out', label: 'Keluar / Pesanan (-)' },
-                { id: 'adjustment', label: 'Penyesuaian' },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setTypeFilter(t.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    typeFilter === t.id
-                      ? 'bg-coffee-900 text-white'
-                      : 'bg-coffee-50 text-coffee-700 hover:bg-coffee-100'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
+                  {/* Type buttons */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { id: '', label: 'Semua Mutasi' },
+                        { id: 'in', label: 'Masuk (+)' },
+                        { id: 'out', label: 'Keluar / Pesanan (-)' },
+                        { id: 'adjustment', label: 'Penyesuaian' },
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => setTypeFilter(t.id)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${typeFilter === t.id
+                              ? 'bg-coffee-900 text-white'
+                              : 'bg-coffee-50 text-coffee-700 hover:bg-coffee-100'
+                            }`}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
 
-            {/* Ingredient dropdown */}
-            <select
-              value={ingredientFilter}
-              onChange={(e) => setIngredientFilter(e.target.value)}
-              className="input-field text-xs py-1.5 px-3 w-48 bg-white"
-            >
-              <option value="">Semua Bahan Baku</option>
-              {ingredients.map((ing) => (
-                <option key={ing.id} value={ing.id}>{ing.name}</option>
-              ))}
-            </select>
-          </div>
+                    {/* Ingredient dropdown */}
+                    <select
+                      value={ingredientFilter}
+                      onChange={(e) => setIngredientFilter(e.target.value)}
+                      className="input-field text-xs py-1.5 px-3 w-full sm:w-48 bg-white"
+                    >
+                      <option value="">Semua Bahan Baku</option>
+                      {ingredients.map((ing) => (
+                        <option key={ing.id} value={ing.id}>{ing.name}</option>
+                      ))}
+                    </select>
+                  </div>
 
-          <button
-            onClick={fetchData}
-            className="p-2 text-coffee-500 hover:text-coffee-900 hover:bg-coffee-50 rounded-lg transition-colors"
-            title="Refresh"
-          >
-            <RefreshCw size={16} />
-          </button>
-        </div>
+                  <button
+                    onClick={fetchData}
+                    className="p-2 text-coffee-500 hover:text-coffee-900 hover:bg-coffee-50 rounded-lg transition-colors shrink-0"
+                    title="Refresh"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
 
-        {/* Table */}
-        <div className="bg-white rounded-2xl shadow-sm border border-coffee-100 overflow-hidden">
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-            </div>
-          ) : mutations.length === 0 ? (
-            <div className="text-center py-16 text-coffee-400">
-              <History size={40} className="mx-auto text-coffee-300 mb-2" />
-              <p className="font-semibold text-coffee-700">Tidak ada riwayat mutasi.</p>
-              <p className="text-xs mt-1">Belum ada aktivitas stok untuk filter yang dipilih.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-coffee-50/60 border-b border-coffee-100 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Waktu &amp; Tanggal</th>
-                    <th className="py-3.5 px-6">Bahan Baku</th>
-                    <th className="py-3.5 px-6">Tipe Mutasi</th>
-                    <th className="py-3.5 px-6">Perubahan Stok</th>
-                    <th className="py-3.5 px-6">Sebelum &rarr; Sesudah</th>
-                    <th className="py-3.5 px-6">Keterangan Aktivitas</th>
-                    <th className="py-3.5 px-6">Petugas</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-coffee-50 text-sm">
-                  {mutations.map((m) => {
-                    const isOut = m.type === 'out';
-                    const isIn = m.type === 'in';
-                    const unit = m.ingredient?.unit || '';
+                {/* Table / Mobile Cards */}
+                <div className="bg-white rounded-2xl shadow-sm border border-coffee-100 overflow-hidden">
+                  {loading ? (
+                    <div className="flex justify-center py-20">
+                      <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                    </div>
+                  ) : mutations.length === 0 ? (
+                      <div className="text-center py-16 text-coffee-400 px-4">
+                        <History size={40} className="mx-auto text-coffee-300 mb-2" />
+                        <p className="font-semibold text-coffee-700">Tidak ada riwayat mutasi.</p>
+                        <p className="text-xs mt-1">Belum ada aktivitas stok untuk filter yang dipilih.</p>
+                      </div>
+                      ) : (
+                                    <>
+                                      <div className="md:hidden divide-y divide-coffee-100">
+                                        {mutations.map((m) => {
+                                          const isOut = m.type === 'out';
+                                          const isIn = m.type === 'in';
+                                          const unit = m.ingredient?.unit || '';
+                                          return (
+                                            <div key={m.id} className="p-4 space-y-2">
+                                              <div className="flex items-start justify-between gap-2">
+                                                <div className="min-w-0 flex-1">
+                                                  <p className="font-semibold text-coffee-900 truncate">{m.ingredient?.name || '-'}</p>
+                                                  <p className="text-[11px] text-coffee-400">
+                                                    {new Date(m.created_at).toLocaleString('id-ID', {
+                                                      day: '2-digit',
+                                                      month: 'short',
+                                                      year: 'numeric',
+                                                      hour: '2-digit',
+                                                      minute: '2-digit',
+                                                    })}
+                                                  </p>
+                                                </div>
+                                                <span className={`font-bold text-sm shrink-0 whitespace-nowrap ${isIn ? 'text-emerald-700' : isOut ? 'text-amber-700' : 'text-blue-700'
+                                                  }`}>
+                                                  {isIn ? '+' : isOut ? '-' : ''}
+                                                  {Number(m.quantity).toLocaleString('id-ID')} {unit}
+                                                </span>
+                                              </div>
+                                              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-semibold ${isIn
+                                                    ? 'bg-emerald-100 text-emerald-800'
+                                                    : isOut
+                                                      ? 'bg-amber-100 text-amber-800'
+                                                      : 'bg-blue-100 text-blue-800'
+                                                  }`}>
+                                                  {isIn ? <ArrowDownLeft size={12} /> : isOut ? <ArrowUpRight size={12} /> : null}
+                                                  {isIn ? 'Masuk' : isOut ? 'Keluar' : 'Penyesuaian'}
+                                                </span>
+                                                <span className="text-coffee-500 font-mono">
+                                                  {Number(m.previous_stock).toLocaleString('id-ID')} &rarr;{' '}
+                                                  <strong className="text-coffee-800">{Number(m.current_stock).toLocaleString('id-ID')}</strong> {unit}
+                                  </span>
+                                </div>
+                      { m.notes && <p className="text-xs text-coffee-600 break-words">{m.notes}</p> }
+                              <p className="text-[11px] text-coffee-400">Petugas: {m.user?.name || 'Sistem'}</p>
+                    </div>
+                          );
+                })}
+                      </div>
 
-                    return (
-                      <tr key={m.id} className="hover:bg-coffee-50/40 transition-colors">
-                        <td className="py-4 px-6 text-xs text-coffee-500 whitespace-nowrap">
-                          {new Date(m.created_at).toLocaleString('id-ID', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </td>
-                        <td className="py-4 px-6 font-medium text-coffee-900">
-                          {m.ingredient?.name || '-'}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                            isIn
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : isOut
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-blue-100 text-blue-800'
-                          }`}>
-                            {isIn ? <ArrowDownLeft size={13} /> : isOut ? <ArrowUpRight size={13} /> : null}
-                            {isIn ? 'Masuk' : isOut ? 'Keluar' : 'Penyesuaian'}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`font-bold text-sm ${
-                            isIn ? 'text-emerald-700' : isOut ? 'text-amber-700' : 'text-blue-700'
-                          }`}>
-                            {isIn ? '+' : isOut ? '-' : ''}
-                            {Number(m.quantity).toLocaleString('id-ID')} {unit}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-xs text-coffee-500 font-mono">
-                          {Number(m.previous_stock).toLocaleString('id-ID')} &rarr;{' '}
-                          <strong className="text-coffee-800">{Number(m.current_stock).toLocaleString('id-ID')}</strong> {unit}
-                        </td>
-                        <td className="py-4 px-6 text-xs text-coffee-700 max-w-xs">
-                          {m.notes || '-'}
-                        </td>
-                        <td className="py-4 px-6 text-xs text-coffee-500">
-                          {m.user?.name || 'Sistem'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-    </DashboardLayout>
-  );
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full min-w-[780px] text-left border-collapse">
+                          <thead>
+                            <tr className="bg-coffee-50/60 border-b border-coffee-100 text-xs font-semibold text-coffee-600 uppercase tracking-wider">
+                              <th className="py-3.5 px-6">Waktu &amp; Tanggal</th>
+                              <th className="py-3.5 px-6">Bahan Baku</th>
+                              <th className="py-3.5 px-6">Tipe Mutasi</th>
+                              <th className="py-3.5 px-6">Perubahan Stok</th>
+                              <th className="py-3.5 px-6">Sebelum &rarr; Sesudah</th>
+                              <th className="py-3.5 px-6">Keterangan Aktivitas</th>
+                              <th className="py-3.5 px-6">Petugas</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-coffee-50 text-sm">
+                            {mutations.map((m) => {
+                              const isOut = m.type === 'out';
+                              const isIn = m.type === 'in';
+                              const unit = m.ingredient?.unit || '';
+
+                              return (
+                                <tr key={m.id} className="hover:bg-coffee-50/40 transition-colors">
+                                  <td className="py-4 px-6 text-xs text-coffee-500 whitespace-nowrap">
+                                    {new Date(m.created_at).toLocaleString('id-ID', {
+                                      day: '2-digit',
+                                      month: 'short',
+                                      year: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}
+                                  </td>
+                                  <td className="py-4 px-6 font-medium text-coffee-900">
+                                    {m.ingredient?.name || '-'}
+                                  </td>
+                                  <td className="py-4 px-6 whitespace-nowrap">
+                                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${isIn
+                                        ? 'bg-emerald-100 text-emerald-800'
+                                        : isOut
+                                          ? 'bg-amber-100 text-amber-800'
+                                          : 'bg-blue-100 text-blue-800'
+                                      }`}>
+                                      {isIn ? <ArrowDownLeft size={13} /> : isOut ? <ArrowUpRight size={13} /> : null}
+                                      {isIn ? 'Masuk' : isOut ? 'Keluar' : 'Penyesuaian'}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-6 whitespace-nowrap">
+                                    <span className={`font-bold text-sm ${isIn ? 'text-emerald-700' : isOut ? 'text-amber-700' : 'text-blue-700'
+                                      }`}>
+                                      {isIn ? '+' : isOut ? '-' : ''}
+                                      {Number(m.quantity).toLocaleString('id-ID')} {unit}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-6 text-xs text-coffee-500 font-mono whitespace-nowrap">
+                                    {Number(m.previous_stock).toLocaleString('id-ID')} &rarr;{' '}
+                                    <strong className="text-coffee-800">{Number(m.current_stock).toLocaleString('id-ID')}</strong> {unit}
+                                  </td>
+                                  <td className="py-4 px-6 text-xs text-coffee-700 max-w-xs">
+                                    {m.notes || '-'}
+                                  </td>
+                                  <td className="py-4 px-6 text-xs text-coffee-500 whitespace-nowrap">
+                                    {m.user?.name || 'Sistem'}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </DashboardLayout>
+            );
 }

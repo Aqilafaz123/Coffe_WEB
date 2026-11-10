@@ -47,144 +47,144 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+      <div className="min-h-screen overflow-x-clip">
+        <Navbar />
 
-      {/* Hero */}
-      <section className="relative h-screen min-h-[600px] flex items-center">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920&h=1080&fit=crop)' }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-coffee-950/90 via-coffee-900/70 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20">
-          <div className="max-w-xl animate-fade-up">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-8 h-0.5 bg-gold" />
-              <p className="text-gold text-xs md:text-sm font-semibold tracking-widest uppercase">
-                Rahardja • Es Krim, Teh &amp; Kopi
-              </p>
-            </div>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-              Cita Rasa Istimewa<br />di Setiap Momen!
-            </h1>
-            <p className="text-white/80 text-base md:text-lg mb-8 leading-relaxed">
-              Nikmati kelembutan es krim premium, seduhan teh pilihan beraroma segar, dan racikan kopi berkualitas tinggi dari Rahardja.
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link to="/shop" className="inline-flex items-center gap-2 bg-white text-coffee-900 px-8 py-4 rounded-full font-semibold hover:bg-coffee-100 transition-all hover:shadow-xl hover:shadow-black/20 active:scale-95">
-                Order Now
-                <ArrowRight size={18} />
-              </Link>
-              <Link to="/pantau-pesanan" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white border border-white/30 px-6 py-4 rounded-full font-semibold hover:bg-white/25 transition-all active:scale-95">
-                <Clock size={18} className="text-gold animate-pulse" />
-                Pantau Pesanan
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            {categories.map((cat) => {
-              const Icon = categoryIcons[cat.slug] || Coffee;
-              return (
-                <Link
-                  key={cat.id}
-                  to={`/shop?category=${cat.slug}`}
-                  className="flex flex-col items-center gap-4 p-6 rounded-2xl hover:bg-coffee-50 transition-colors group"
-                >
-                  <div className="w-16 h-16 rounded-full border-2 border-coffee-300 flex items-center justify-center group-hover:border-coffee-600 group-hover:bg-coffee-100 transition-all">
-                    <Icon size={28} className="text-coffee-600" />
-                  </div>
-                  <span className="text-coffee-800 font-medium text-sm">{cat.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Coffee Products */}
-      <section className="py-20 bg-coffee-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title mb-12">Our Special Coffee</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {coffeeProducts.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-          <div className="text-center mt-10">
-            <Link to="/shop?category=hot-coffee" className="btn-outline inline-flex items-center gap-2">
-              Lihat Semua Kopi <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Promo Banner */}
-      <section className="py-20 bg-coffee-200 relative overflow-hidden">
-        <div className="absolute left-0 top-0 w-48 h-48 opacity-30">
-          <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55c?w=200&h=200&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
-        </div>
-        <div className="absolute right-0 bottom-0 w-56 h-56 opacity-30">
-          <img src="https://images.unsplash.com/photo-1447933601403-0c6688de01e5?w=250&h=250&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
-        </div>
-        <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-coffee-900 mb-6">
-            Check out our best coffee beans
-          </h2>
-          <Link to="/shop" className="btn-primary inline-flex items-center gap-2">
-            Explore our products <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
-
-      {/* Dessert Products */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="section-title mb-12">Our Special Dessert</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {dessertProducts.map((p) => <ProductCard key={p.id} product={p} />)}
-          </div>
-        </div>
-      </section>
-
-      <TestimonialsSection />
-
-      {/* Newsletter */}
-      <section className="py-20 bg-coffee-100 relative overflow-hidden">
-        <div className="max-w-2xl mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-3xl font-bold text-coffee-900 mb-3">Join in and get 15% Off!</h2>
-          <p className="text-coffee-600 mb-8">
-            Subscribe dengan email akun terdaftar dan dapatkan kode diskon 15%.
-          </p>
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Masukkan email Anda"
-              className="input-field flex-1"
-              required
+        {/* Hero */}
+          <section className="relative min-h-[600px] h-screen max-h-[960px] flex items-center">
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920&h=1080&fit=crop)' }}
             />
-            <button type="submit" className="btn-primary whitespace-nowrap">Subscribe</button>
-          </form>
-          {subscribeMsg && (
-            <p className={`mt-4 text-sm font-medium ${subscribeSuccess ? 'text-green-700' : 'text-red-600'}`}>
-              {subscribeMsg}
-            </p>
-          )}
-          {!subscribeSuccess && (
-            <p className="mt-3 text-coffee-500 text-xs">
-              Belum punya akun? <Link to="/register" className="text-coffee-800 underline hover:text-coffee-900">Daftar di sini</Link>
-            </p>
-          )}
-        </div>
-      </section>
+            <div className="absolute inset-0 bg-gradient-to-r from-coffee-950/90 via-coffee-900/75 to-coffee-950/35 sm:to-transparent" />
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-20">
+              <div className="max-w-xl animate-fade-up">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <span className="w-6 sm:w-8 h-0.5 bg-gold shrink-0" />
+                    <p className="text-gold text-xs md:text-sm font-semibold tracking-widest uppercase">
+                      Rahardja • Es Krim, Teh &amp; Kopi
+                    </p>
+                  </div>
+                    <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight mb-5 sm:mb-6">
+                      Cita Rasa Istimewa<br />di Setiap Momen!
+                    </h1>
+                      <p className="text-white/80 text-sm sm:text-base md:text-lg mb-7 sm:mb-8 leading-relaxed">
+                        Nikmati kelembutan es krim premium, seduhan teh pilihan beraroma segar, dan racikan kopi berkualitas tinggi dari Rahardja.
+                      </p>
+                          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                            <Link to="/shop" className="inline-flex items-center gap-2 bg-white text-coffee-900 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-semibold hover:bg-coffee-100 transition-all hover:shadow-xl hover:shadow-black/20 active:scale-95">
+                              Order Now
+                              <ArrowRight size={18} />
+                            </Link>
+                              <Link to="/pantau-pesanan" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white border border-white/30 px-5 sm:px-6 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-semibold hover:bg-white/25 transition-all active:scale-95">
+                                <Clock size={18} className="text-gold animate-pulse shrink-0" />
+                                Pantau Pesanan
+                              </Link>
+                          </div>
+                      </div>
+                    </div>
+                  </section>
 
-      <Footer />
-    </div>
-  );
+                  {/* Categories */}
+                    <section className="py-12 sm:py-16 bg-white">
+                      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+                            {categories.map((cat) => {
+                              const Icon = categoryIcons[cat.slug] || Coffee;
+                              return (
+                                <Link
+                                  key={cat.id}
+                                  to={`/shop?category=${cat.slug}`}
+                                  className="flex flex-col items-center gap-3 sm:gap-4 p-4 sm:p-6 rounded-2xl hover:bg-coffee-50 transition-colors group text-center"
+                                >
+                                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-coffee-300 flex items-center justify-center group-hover:border-coffee-600 group-hover:bg-coffee-100 transition-all">
+                                      <Icon size={26} className="text-coffee-600" />
+                                    </div>
+                                    <span className="text-coffee-800 font-medium text-sm">{cat.name}</span>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        </div>
+                    </section>
+
+                    {/* Coffee Products */}
+                      <section className="py-14 sm:py-20 bg-coffee-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="section-title mb-8 sm:mb-12">Our Special Coffee</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                              {coffeeProducts.map((p) => <ProductCard key={p.id} product={p} />)}
+                            </div>
+                              <div className="text-center mt-8 sm:mt-10">
+                                <Link to="/shop?category=hot-coffee" className="btn-outline inline-flex items-center gap-2">
+                                  Lihat Semua Kopi <ArrowRight size={16} />
+                                </Link>
+                              </div>
+                            </div>
+                          </section>
+
+                          {/* Promo Banner */}
+                              <section className="py-16 sm:py-20 bg-coffee-200 relative overflow-hidden">
+                                <div className="absolute -left-10 -top-10 sm:left-0 sm:top-0 w-32 h-32 sm:w-48 sm:h-48 opacity-20 sm:opacity-30 pointer-events-none">
+                                  <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55c?w=200&h=200&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
+                                </div>
+                                  <div className="absolute -right-10 -bottom-10 sm:right-0 sm:bottom-0 w-36 h-36 sm:w-56 sm:h-56 opacity-20 sm:opacity-30 pointer-events-none">
+                                    <img src="https://images.unsplash.com/photo-1447933601403-0c6688de01e5?w=250&h=250&fit=crop" alt="" className="w-full h-full object-cover rounded-full" />
+                                  </div>
+                                  <div className="max-w-3xl mx-auto px-4 text-center relative z-10">
+                                      <h2 className="font-display text-2xl sm:text-3xl md:text-5xl font-bold text-coffee-900 mb-6">
+                                        Check out our best coffee beans
+                                      </h2>
+                                      <Link to="/shop" className="btn-primary inline-flex items-center gap-2">
+                                        Explore our products <ArrowRight size={16} />
+                                      </Link>
+                                  </div>
+                              </section>
+
+                              {/* Dessert Products */}
+                                <section className="py-14 sm:py-20 bg-white">
+                                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                      <h2 className="section-title mb-8 sm:mb-12">Our Special Dessert</h2>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                                        {dessertProducts.map((p) => <ProductCard key={p.id} product={p} />)}
+                                      </div>
+                                    </div>
+                                </section>
+
+                                <TestimonialsSection />
+
+                                {/* Newsletter */}
+                                  <section className="py-14 sm:py-20 bg-coffee-100 relative overflow-hidden">
+                                    <div className="max-w-2xl mx-auto px-4 text-center relative z-10">
+                                        <h2 className="font-display text-2xl sm:text-3xl font-bold text-coffee-900 mb-3">Join in and get 15% Off!</h2>
+                                        <p className="text-coffee-600 text-sm sm:text-base mb-6 sm:mb-8">
+                                          Subscribe dengan email akun terdaftar dan dapatkan kode diskon 15%.
+                                        </p>
+                                        <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                                          <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="Masukkan email Anda"
+                                            className="input-field flex-1"
+                                            required
+                                          />
+                                          <button type="submit" className="btn-primary whitespace-nowrap">Subscribe</button>
+                                        </form>
+                                        {subscribeMsg && (
+                                          <p className={`mt-4 text-sm font-medium ${subscribeSuccess ? 'text-green-700' : 'text-red-600'}`}>
+                                            {subscribeMsg}
+                                          </p>
+                                        )}
+                                        {!subscribeSuccess && (
+                                          <p className="mt-3 text-coffee-500 text-xs">
+                                            Belum punya akun? <Link to="/register" className="text-coffee-800 underline hover:text-coffee-900">Daftar di sini</Link>
+                                          </p>
+                                        )}
+                                    </div>
+                                  </section>
+
+                                  <Footer />
+                                </div>
+                                );
 }

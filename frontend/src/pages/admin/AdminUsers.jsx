@@ -53,73 +53,97 @@ export default function AdminUsers() {
 
   return (
     <DashboardLayout title="Kelola Pengguna" role="superadmin">
-      <div className="flex justify-end mb-6">
-        <button onClick={openCreate} className="btn-primary flex items-center gap-2 text-sm">
-          <Plus size={16} /> Tambah User
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-coffee-50">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Nama</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Email</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Role</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Telepon</th>
-                <th className="text-right px-6 py-4 text-sm font-medium text-coffee-600">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-coffee-100">
-              {users.map((u) => (
-                <tr key={u.id} className="hover:bg-coffee-50/50">
-                  <td className="px-6 py-4 font-medium text-coffee-900">{u.name}</td>
-                  <td className="px-6 py-4 text-sm text-coffee-600">{u.email}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${roleColors[u.role]}`}>
-                      {roleLabels[u.role]}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-coffee-600">{u.phone || '-'}</td>
-                  <td className="px-6 py-4 text-right">
-                    <button onClick={() => openEdit(u)} className="p-2 text-coffee-500 hover:text-coffee-900"><Pencil size={16} /></button>
-                    <button onClick={() => handleDelete(u.id)} className="p-2 text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="font-semibold text-lg">{editing ? 'Edit User' : 'Tambah User'}</h3>
-              <button onClick={() => setShowModal(false)}><X size={20} /></button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input placeholder="Nama" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input-field" required />
-              <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input-field" required />
-              <input type="password" placeholder={editing ? 'Password (kosongkan jika tidak diubah)' : 'Password'} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="input-field" {...(!editing && { required: true })} />
-              <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="input-field">
-                <option value="user">User</option>
-                <option value="cashier">Kasir</option>
-                <option value="logistics">Staff Logistik</option>
-                <option value="superadmin">Super Admin</option>
-              </select>
-              <input placeholder="Telepon" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input-field" />
-              <button type="submit" className="btn-primary w-full">{editing ? 'Update' : 'Simpan'}</button>
-            </form>
+          <div className="flex justify-end mb-4 sm:mb-6">
+            <button onClick={openCreate} className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 text-sm">
+              <Plus size={16} /> Tambah User
+            </button>
           </div>
-        </div>
+
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                      <div className="md:hidden divide-y divide-coffee-100">
+                        {users.map((u) => (
+                          <div key={u.id} className="p-4 space-y-2.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <p className="font-semibold text-coffee-900 truncate">{u.name}</p>
+                                <p className="text-xs text-coffee-600 break-all">{u.email}</p>
+                              </div>
+                              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0 ${roleColors[u.role]}`}>
+                                {roleLabels[u.role]}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between gap-2 pt-1">
+                              <span className="text-xs text-coffee-500">Telp: {u.phone || '-'}</span>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <button onClick={() => openEdit(u)} className="p-2 text-coffee-600 hover:bg-coffee-50 rounded-lg"><Pencil size={16} /></button>
+                                <button onClick={() => handleDelete(u.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full min-w-[680px]">
+                          <thead className="bg-coffee-50">
+                            <tr>
+                              <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Nama</th>
+                              <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Email</th>
+                              <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Role</th>
+                              <th className="text-left px-6 py-4 text-sm font-medium text-coffee-600">Telepon</th>
+                              <th className="text-right px-6 py-4 text-sm font-medium text-coffee-600">Aksi</th>
+                            </tr>
+                      </thead>
+                      <tbody className="divide-y divide-coffee-100">
+                        {users.map((u) => (
+                          <tr key={u.id} className="hover:bg-coffee-50/50">
+                            <td className="px-6 py-4 font-medium text-coffee-900">{u.name}</td>
+                            <td className="px-6 py-4 text-sm text-coffee-600">{u.email}</td>
+                            <td className="px-6 py-4">
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${roleColors[u.role]}`}>
+                                {roleLabels[u.role]}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-coffee-600 whitespace-nowrap">{u.phone || '-'}</td>
+                            <td className="px-6 py-4 text-right whitespace-nowrap">
+                              <button onClick={() => openEdit(u)} className="p-2 text-coffee-500 hover:text-coffee-900"><Pencil size={16} /></button>
+                              <button onClick={() => handleDelete(u.id)} className="p-2 text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+          </div>
+            </div>
+          )}
+
+          {showModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-white rounded-2xl p-5 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+                    <div className="flex justify-between items-center mb-5 sm:mb-6">
+                      <h3 className="font-semibold text-lg">{editing ? 'Edit User' : 'Tambah User'}</h3>
+                      <button onClick={() => setShowModal(false)}><X size={20} /></button>
+                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <input placeholder="Nama" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input-field" required />
+                      <input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input-field" required />
+                      <input type="password" placeholder={editing ? 'Password (kosongkan jika tidak diubah)' : 'Password'} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="input-field" {...(!editing && { required: true })} />
+                      <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="input-field">
+                        <option value="user">User</option>
+                        <option value="cashier">Kasir</option>
+                        <option value="logistics">Staff Logistik</option>
+                        <option value="superadmin">Super Admin</option>
+                      </select>
+                      <input placeholder="Telepon" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="input-field" />
+                      <button type="submit" className="btn-primary w-full">{editing ? 'Update' : 'Simpan'}</button>
+                    </form>
+                  </div>
+                </div>
       )}
-    </DashboardLayout>
-  );
+              </DashboardLayout>
+              );
 }

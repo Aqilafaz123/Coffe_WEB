@@ -23,11 +23,16 @@
   scroll-behavior: smooth;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--color-cream);
   color: var(--color-coffee-900);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 .font-display {
@@ -35,13 +40,25 @@ body {
 }
 
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-fade-up {
@@ -68,20 +85,15 @@ body {
 }
 
 .btn-primary {
-  @apply bg-coffee-900 text-white px-6 py-3 rounded-full font-medium
-         hover:bg-coffee-800 transition-all duration-300
-         hover:shadow-lg hover:shadow-coffee-900/20 active:scale-95;
+  @apply bg-coffee-900 text-white px-6 py-3 rounded-full font-medium hover:bg-coffee-800 transition-all duration-300 hover:shadow-lg hover:shadow-coffee-900/20 active:scale-95;
 }
 
 .btn-outline {
-  @apply border-2 border-coffee-900 text-coffee-900 px-6 py-3 rounded-full font-medium
-         hover:bg-coffee-900 hover:text-white transition-all duration-300 active:scale-95;
+  @apply border-2 border-coffee-900 text-coffee-900 px-6 py-3 rounded-full font-medium hover:bg-coffee-900 hover:text-white transition-all duration-300 active:scale-95;
 }
 
 .input-field {
-  @apply w-full px-4 py-3 rounded-xl border border-coffee-200 bg-white
-         focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-transparent
-         transition-all duration-200;
+  @apply w-full px-4 py-3 rounded-xl border border-coffee-200 bg-white focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-transparent transition-all duration-200;
 }
 
 .section-title {
@@ -94,7 +106,11 @@ body {
     margin: 10mm 12mm 12mm 12mm;
   }
 
-  aside, header, nav, button, .no-print {
+  aside,
+  header,
+  nav,
+  button,
+  .no-print {
     display: none !important;
   }
 
@@ -133,4 +149,3 @@ body {
     print-color-adjust: exact !important;
   }
 }
-

@@ -81,9 +81,9 @@ export default function CustomerSelect({ value, onChange }) {
             key={m.id}
             type="button"
             onClick={() => switchMode(m.id)}
-            className={`flex-1 py-2.5 px-1 text-center text-xs sm:text-sm font-medium rounded-lg transition-all ${mode === m.id
-                ? 'bg-white text-coffee-900 shadow-sm'
-                : 'text-coffee-600 hover:text-coffee-800'
+            className={`flex-1 py-2 sm:py-2.5 px-1.5 text-center text-xs sm:text-sm font-medium rounded-lg transition-all whitespace-nowrap ${mode === m.id
+              ? 'bg-white text-coffee-900 shadow-sm'
+              : 'text-coffee-600 hover:text-coffee-800'
               }`}
           >
             {m.label}

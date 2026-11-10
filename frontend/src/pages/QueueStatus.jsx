@@ -32,17 +32,17 @@ export default function QueueStatus() {
   }, [fetchStatus]);
 
   // ── Derived state ─────────────────────────────────────
-  const isReady    = data?.is_ready && data?.order_status !== 'completed';
-  const isDone     = data?.order_status === 'completed';
-  const isWaiting  = data?.has_queue && !isReady && !isDone;
-  const notQueued  = data && !data.has_queue;
+  const isReady = data?.is_ready && data?.order_status !== 'completed';
+  const isDone = data?.order_status === 'completed';
+  const isWaiting = data?.has_queue && !isReady && !isDone;
+  const notQueued = data && !data.has_queue;
 
   // ── Status badge config ───────────────────────────────
   const statusConfig = isDone
-    ? { label: 'Selesai',        bg: '#f0fdf4', text: '#16a34a', border: '#bbf7d0', icon: '✓' }
+    ? { label: 'Selesai', bg: '#f0fdf4', text: '#16a34a', border: '#bbf7d0', icon: '✓' }
     : isReady
-    ? { label: 'Siap Diambil!',  bg: '#fffbeb', text: '#d97706', border: '#fde68a', icon: '🔔' }
-    : { label: 'Menunggu',       bg: '#f4f7fc', text: '#224fa8', border: '#cfe0fb', icon: '⏳' };
+      ? { label: 'Siap Diambil!', bg: '#fffbeb', text: '#d97706', border: '#fde68a', icon: '🔔' }
+      : { label: 'Menunggu', bg: '#f4f7fc', text: '#224fa8', border: '#cfe0fb', icon: '⏳' };
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: '#f4f7fc' }}>
@@ -98,207 +98,207 @@ export default function QueueStatus() {
         .num-pulse { animation: number-pulse 2s ease-in-out infinite; }
       `}</style>
 
-      <div className="min-h-screen flex flex-col items-center justify-center px-5 py-12 relative">
-        <div className="w-full max-w-sm">
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-5 py-8 sm:py-12 relative">
+          <div className="w-full max-w-sm">
 
-          {/* Navigation Links */}
-          <div className="su flex items-center justify-between mb-8">
-            <Link to="/pantau-pesanan" className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all hover:opacity-75" style={{ color: '#224fa8' }}>
-              <ChevronLeft size={18} />
-              Papan Antrian
-            </Link>
-            <Link to="/riwayat" className="text-xs font-medium hover:underline" style={{ color: '#224fa8' }}>
-              Riwayat Saya →
-            </Link>
-          </div>
-
-          {/* Logo */}
-          <div className="su flex flex-col items-center mb-8">
-            <Link to="/" className="flex flex-col items-center group">
-              <img
-                src="/logo-navy.png"
-                alt="Rahardja"
-                className="h-16 w-auto object-contain mb-2 transition-transform duration-300 group-hover:scale-105"
-              />
-              <span className="font-display text-2xl font-bold tracking-widest" style={{ color: '#081b56' }}>Status Antrian</span>
-              <span className="text-[10px] tracking-widest text-gold uppercase font-semibold">Rahardja</span>
-            </Link>
-          </div>
-
-          {/* ── Loading ── */}
-          {loading && (
-            <div className="su1 flex flex-col items-center gap-4 py-16">
-              <div className="w-10 h-10 rounded-full border-4 spin-slow" style={{ borderColor: '#cfe0fb', borderTopColor: '#081b56' }} />
-              <p style={{ color: '#224fa8' }}>Mengambil data antrian...</p>
+            {/* Navigation Links */}
+            <div className="su flex items-center justify-between mb-8">
+              <Link to="/pantau-pesanan" className="inline-flex items-center gap-1.5 text-sm font-semibold transition-all hover:opacity-75" style={{ color: '#224fa8' }}>
+                <ChevronLeft size={18} />
+                Papan Antrian
+              </Link>
+              <Link to="/riwayat" className="text-xs font-medium hover:underline" style={{ color: '#224fa8' }}>
+                Riwayat Saya →
+              </Link>
             </div>
-          )}
 
-          {/* ── Error ── */}
-          {!loading && error && (
-            <div className="su1 rounded-2xl px-5 py-4 text-sm flex items-start gap-3"
-              style={{ background: '#fff1f0', border: '1px solid #fecaca', color: '#b91c1c' }}>
-              <span>⚠</span>
-              <span>{error}</span>
+            {/* Logo */}
+            <div className="su flex flex-col items-center mb-8">
+              <Link to="/" className="flex flex-col items-center group">
+                <img
+                  src="/logo-navy.png"
+                  alt="Rahardja"
+                  className="h-16 w-auto object-contain mb-2 transition-transform duration-300 group-hover:scale-105"
+                />
+                <span className="font-display text-2xl font-bold tracking-widest" style={{ color: '#081b56' }}>Status Antrian</span>
+                <span className="text-[10px] tracking-widest text-gold uppercase font-semibold">Rahardja</span>
+              </Link>
             </div>
-          )}
 
-          {/* ── No Queue Yet ── */}
-          {!loading && notQueued && (
-            <div className="su1 rounded-3xl p-7 text-center"
-              style={{ background: 'rgba(255,255,255,0.85)', border: '1.5px solid #cfe0fb', boxShadow: '0 20px 60px rgba(8,27,86,0.06)' }}>
-              <div className="text-4xl mb-3">⏳</div>
-              <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#081b56' }}>Belum Ada Nomor Antrian</h3>
-              <p className="text-sm mb-4" style={{ color: '#224fa8' }}>
-                {data?.message || 'Nomor antrian akan muncul setelah kasir memproses pesananmu.'}
-              </p>
-              <div className="text-xs px-3 py-2 rounded-xl inline-block" style={{ background: '#eef3fb', color: '#081b56' }}>
-                Status pesanan: <strong>{data?.order_status ?? '-'}</strong>
+            {/* ── Loading ── */}
+            {loading && (
+              <div className="su1 flex flex-col items-center gap-4 py-16">
+                <div className="w-10 h-10 rounded-full border-4 spin-slow" style={{ borderColor: '#cfe0fb', borderTopColor: '#081b56' }} />
+                <p style={{ color: '#224fa8' }}>Mengambil data antrian...</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Main Queue Card ── */}
-          {!loading && data?.has_queue && (
-            <>
-              {/* Status Badge */}
-              <div className="su1 flex justify-center mb-5">
-                <span
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isDone ? 'bounce-ready' : ''}`}
-                  style={{ background: statusConfig.bg, color: statusConfig.text, border: `1.5px solid ${statusConfig.border}` }}
-                >
-                  <span>{statusConfig.icon}</span>
-                  {statusConfig.label}
-                </span>
+            {/* ── Error ── */}
+            {!loading && error && (
+              <div className="su1 rounded-2xl px-5 py-4 text-sm flex items-start gap-3"
+                style={{ background: '#fff1f0', border: '1px solid #fecaca', color: '#b91c1c' }}>
+                <span>⚠</span>
+                <span>{error}</span>
               </div>
+            )}
 
-              {/* Main Number Card */}
-              <div className="su2 rounded-3xl p-7 text-center mb-5"
-                style={{
-                  background: 'rgba(255,255,255,0.85)',
-                  border: '1.5px solid #cfe0fb',
-                  boxShadow: '0 20px 60px rgba(8,27,86,0.08), 0 4px 12px rgba(8,27,86,0.04)',
-                }}>
+            {/* ── No Queue Yet ── */}
+            {!loading && notQueued && (
+              <div className="su1 rounded-3xl p-7 text-center"
+                style={{ background: 'rgba(255,255,255,0.85)', border: '1.5px solid #cfe0fb', boxShadow: '0 20px 60px rgba(8,27,86,0.06)' }}>
+                <div className="text-4xl mb-3">⏳</div>
+                <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#081b56' }}>Belum Ada Nomor Antrian</h3>
+                <p className="text-sm mb-4" style={{ color: '#224fa8' }}>
+                  {data?.message || 'Nomor antrian akan muncul setelah kasir memproses pesananmu.'}
+                </p>
+                <div className="text-xs px-3 py-2 rounded-xl inline-block" style={{ background: '#eef3fb', color: '#081b56' }}>
+                  Status pesanan: <strong>{data?.order_status ?? '-'}</strong>
+                </div>
+              </div>
+            )}
 
-                <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#224fa8' }}>Nomor Antrian Kamu</p>
-
-                {/* Big Queue Number */}
-                <div className="relative inline-flex items-center justify-center mb-4">
-                  {(isReady && !isDone) && <div className="ping-ring" />}
-                  <div
-                    className={`w-32 h-32 rounded-full flex flex-col items-center justify-center ${pulse ? 'num-pulse' : ''}`}
-                    style={{
-                      background: isDone
-                        ? 'linear-gradient(135deg, #16a34a, #15803d)'
-                        : isReady
-                        ? 'linear-gradient(135deg, #d97706, #b45309)'
-                        : 'linear-gradient(135deg, #081b56, #193a8d)',
-                      boxShadow: isDone
-                        ? '0 12px 32px rgba(22,163,74,0.35)'
-                        : isReady
-                        ? '0 12px 32px rgba(217,119,6,0.35)'
-                        : '0 12px 32px rgba(8,27,86,0.25)',
-                    }}
+            {/* ── Main Queue Card ── */}
+            {!loading && data?.has_queue && (
+              <>
+                {/* Status Badge */}
+                <div className="su1 flex justify-center mb-5">
+                  <span
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isDone ? 'bounce-ready' : ''}`}
+                    style={{ background: statusConfig.bg, color: statusConfig.text, border: `1.5px solid ${statusConfig.border}` }}
                   >
-                    <span className="font-display font-bold text-white" style={{ fontSize: '14px', opacity: 0.8 }}>#</span>
-                    <span className="font-display font-bold text-white leading-none" style={{ fontSize: '42px' }}>
-                      {data.queue_number}
-                    </span>
-                  </div>
+                    <span>{statusConfig.icon}</span>
+                    {statusConfig.label}
+                  </span>
                 </div>
 
-                {/* Currently called */}
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="flex-1 h-px" style={{ background: '#cfe0fb' }} />
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: '#eef3fb' }}>
-                    <Clock size={13} style={{ color: '#224fa8' }} />
-                    <span className="text-xs" style={{ color: '#224fa8' }}>
-                      Sedang dipanggil: <strong style={{ color: '#081b56' }}>
-                        {data.current_called > 0 ? `#${data.current_called}` : '-'}
-                      </strong>
-                    </span>
-                  </div>
-                  <div className="flex-1 h-px" style={{ background: '#cfe0fb' }} />
-                </div>
+                {/* Main Number Card */}
+                <div className="su2 rounded-3xl p-7 text-center mb-5"
+                  style={{
+                    background: 'rgba(255,255,255,0.85)',
+                    border: '1.5px solid #cfe0fb',
+                    boxShadow: '0 20px 60px rgba(8,27,86,0.08), 0 4px 12px rgba(8,27,86,0.04)',
+                  }}>
 
-                {/* Orders ahead info */}
-                {isWaiting && (
-                  <div className="rounded-2xl px-4 py-3 text-sm" style={{ background: '#eef3fb' }}>
-                    {data.orders_ahead === 0
-                      ? <span style={{ color: '#16a34a' }}>🎉 Kamu berikutnya! Bersiap ya.</span>
-                      : <span style={{ color: '#224fa8' }}>Ada <strong style={{ color: '#081b56' }}>{data.orders_ahead}</strong> pesanan di depanmu</span>
-                    }
-                  </div>
-                )}
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#224fa8' }}>Nomor Antrian Kamu</p>
 
-                {/* Ready message */}
-                {isReady && !isDone && (
-                  <div className="rounded-2xl px-4 py-4 text-center" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
-                    <p className="font-semibold mb-1" style={{ color: '#d97706' }}>🔔 Nomor antrian kamu dipanggil!</p>
-                    <p className="text-xs" style={{ color: '#92400e' }}>Silakan ambil pesananmu di kasir sekarang.</p>
-                  </div>
-                )}
-
-                {/* Done message */}
-                {isDone && (
-                  <div className="rounded-2xl px-4 py-4 text-center flex items-center justify-center gap-3"
-                    style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-                    <CheckCircle size={22} color="#16a34a" />
-                    <div className="text-left">
-                      <p className="font-semibold text-sm" style={{ color: '#16a34a' }}>Pesanan Selesai!</p>
-                      <p className="text-xs" style={{ color: '#4ade80' }}>Terima kasih sudah berkunjung ✨</p>
+                  {/* Big Queue Number */}
+                  <div className="relative inline-flex items-center justify-center mb-4">
+                    {(isReady && !isDone) && <div className="ping-ring" />}
+                    <div
+                      className={`w-32 h-32 rounded-full flex flex-col items-center justify-center ${pulse ? 'num-pulse' : ''}`}
+                      style={{
+                        background: isDone
+                          ? 'linear-gradient(135deg, #16a34a, #15803d)'
+                          : isReady
+                            ? 'linear-gradient(135deg, #d97706, #b45309)'
+                            : 'linear-gradient(135deg, #081b56, #193a8d)',
+                        boxShadow: isDone
+                          ? '0 12px 32px rgba(22,163,74,0.35)'
+                          : isReady
+                            ? '0 12px 32px rgba(217,119,6,0.35)'
+                            : '0 12px 32px rgba(8,27,86,0.25)',
+                      }}
+                    >
+                      <span className="font-display font-bold text-white" style={{ fontSize: '14px', opacity: 0.8 }}>#</span>
+                      <span className="font-display font-bold text-white leading-none" style={{ fontSize: '42px' }}>
+                        {data.queue_number}
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
 
-              {/* Progress dots */}
-              {!isDone && (
-                <div className="su3 flex justify-center gap-2 mb-5">
-                  {['Menunggu', 'Dipanggil', 'Selesai'].map((step, i) => {
-                    const active = (i === 0 && isWaiting) || (i === 1 && isReady) || (i === 2 && isDone);
-                    const done   = (i === 0 && (isReady || isDone)) || (i === 1 && isDone);
-                    return (
-                      <div key={step} className="flex flex-col items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-full transition-all duration-500"
-                          style={{ background: done ? '#16a34a' : active ? '#c99826' : '#cfe0fb' }} />
-                        <span className="text-xs" style={{ color: active ? '#081b56' : '#6893e4' }}>{step}</span>
+                  {/* Currently called */}
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <div className="flex-1 h-px" style={{ background: '#cfe0fb' }} />
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: '#eef3fb' }}>
+                      <Clock size={13} style={{ color: '#224fa8' }} />
+                      <span className="text-xs" style={{ color: '#224fa8' }}>
+                        Sedang dipanggil: <strong style={{ color: '#081b56' }}>
+                          {data.current_called > 0 ? `#${data.current_called}` : '-'}
+                        </strong>
+                      </span>
+                    </div>
+                    <div className="flex-1 h-px" style={{ background: '#cfe0fb' }} />
+                  </div>
+
+                  {/* Orders ahead info */}
+                  {isWaiting && (
+                    <div className="rounded-2xl px-4 py-3 text-sm" style={{ background: '#eef3fb' }}>
+                      {data.orders_ahead === 0
+                        ? <span style={{ color: '#16a34a' }}>🎉 Kamu berikutnya! Bersiap ya.</span>
+                        : <span style={{ color: '#224fa8' }}>Ada <strong style={{ color: '#081b56' }}>{data.orders_ahead}</strong> pesanan di depanmu</span>
+                      }
+                    </div>
+                  )}
+
+                  {/* Ready message */}
+                  {isReady && !isDone && (
+                    <div className="rounded-2xl px-4 py-4 text-center" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
+                      <p className="font-semibold mb-1" style={{ color: '#d97706' }}>🔔 Nomor antrian kamu dipanggil!</p>
+                      <p className="text-xs" style={{ color: '#92400e' }}>Silakan ambil pesananmu di kasir sekarang.</p>
+                    </div>
+                  )}
+
+                  {/* Done message */}
+                  {isDone && (
+                    <div className="rounded-2xl px-4 py-4 text-center flex items-center justify-center gap-3"
+                      style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+                      <CheckCircle size={22} color="#16a34a" />
+                      <div className="text-left">
+                        <p className="font-semibold text-sm" style={{ color: '#16a34a' }}>Pesanan Selesai!</p>
+                        <p className="text-xs" style={{ color: '#4ade80' }}>Terima kasih sudah berkunjung ✨</p>
                       </div>
-                    );
-                  })}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* Order info */}
-              <div className="su3 rounded-2xl px-4 py-3 flex items-center justify-between"
-                style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid #cfe0fb' }}>
-                <div>
-                  <p className="text-xs" style={{ color: '#224fa8' }}>Nomor Pesanan</p>
-                  <p className="text-sm font-semibold" style={{ color: '#081b56' }}>{data.order_number}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs" style={{ color: '#224fa8' }}>Diperbarui</p>
-                  <p className="text-xs flex items-center gap-1 justify-end" style={{ color: '#224fa8' }}>
-                    <RefreshCw size={11} />
-                    {lastUpdated ? lastUpdated.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-'}
-                  </p>
-                </div>
-              </div>
+                {/* Progress dots */}
+                {!isDone && (
+                  <div className="su3 flex justify-center gap-2 mb-5">
+                    {['Menunggu', 'Dipanggil', 'Selesai'].map((step, i) => {
+                      const active = (i === 0 && isWaiting) || (i === 1 && isReady) || (i === 2 && isDone);
+                      const done = (i === 0 && (isReady || isDone)) || (i === 1 && isDone);
+                      return (
+                        <div key={step} className="flex flex-col items-center gap-1.5">
+                          <div className="w-3 h-3 rounded-full transition-all duration-500"
+                            style={{ background: done ? '#16a34a' : active ? '#c99826' : '#cfe0fb' }} />
+                          <span className="text-xs" style={{ color: active ? '#081b56' : '#6893e4' }}>{step}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
-              {/* Manual Refresh Button */}
-              <button
-                type="button"
-                onClick={fetchStatus}
-                disabled={loading}
-                className="su3 w-full mt-4 py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer text-white"
-                style={{ background: '#081b56' }}
-              >
-                <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-                {loading ? 'Memuat data...' : 'Segarkan Status Antrian'}
-              </button>
-            </>
+                {/* Order info */}
+              <div className="su3 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2"
+                  style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid #cfe0fb' }}>
+                    <div className="min-w-0">
+                      <p className="text-xs" style={{ color: '#224fa8' }}>Nomor Pesanan</p>
+                      <p className="text-sm font-semibold break-all" style={{ color: '#081b56' }}>{data.order_number}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs" style={{ color: '#224fa8' }}>Diperbarui</p>
+                      <p className="text-xs flex items-center gap-1 justify-end" style={{ color: '#224fa8' }}>
+                        <RefreshCw size={11} />
+                        {lastUpdated ? lastUpdated.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '-'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Manual Refresh Button */}
+                  <button
+                    type="button"
+                    onClick={fetchStatus}
+                    disabled={loading}
+                    className="su3 w-full mt-4 py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold transition-all hover:opacity-90 active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer text-white"
+                    style={{ background: '#081b56' }}
+                  >
+                    <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+                    {loading ? 'Memuat data...' : 'Segarkan Status Antrian'}
+                  </button>
+                </>
           )}
+              </div>
+          </div>
         </div>
-      </div>
-    </div>
-  );
+        );
 }

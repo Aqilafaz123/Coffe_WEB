@@ -21,36 +21,36 @@ export default function Reservasi() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-coffee-50">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="font-display text-4xl font-bold text-coffee-900 mb-3">Reservasi Ruangan</h1>
-            <p className="text-coffee-500 max-w-xl mx-auto">
-              Pilih ruangan favorit Anda untuk meeting, hangout, atau acara privat. Jam operasional 08:00 – 22:00.
-            </p>
-            {user?.role === 'user' && (
-              <Link to="/riwayat?tab=reservasi" className="inline-flex items-center gap-2 mt-4 text-coffee-800 hover:text-coffee-900 text-sm font-medium">
-                <CalendarCheck size={16} /> Lihat Riwayat Reservasi
-              </Link>
-            )}
-          </div>
+      <div className="min-h-screen bg-coffee-50 flex flex-col">
+        <Navbar />
+          <div className="flex-1 pt-20 sm:pt-24 pb-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="text-center mb-10 sm:mb-12">
+                    <h1 className="font-display text-3xl sm:text-4xl font-bold text-coffee-900 mb-3">Reservasi Ruangan</h1>
+                    <p className="text-coffee-500 text-sm sm:text-base max-w-xl mx-auto">
+                      Pilih ruangan favorit Anda untuk meeting, hangout, atau acara privat. Jam operasional 08:00 – 22:00.
+                    </p>
+                    {user?.role === 'user' && (
+                      <Link to="/riwayat?tab=reservasi" className="inline-flex items-center gap-2 mt-4 text-coffee-800 hover:text-coffee-900 text-sm font-medium">
+                        <CalendarCheck size={16} /> Lihat Riwayat Reservasi
+                      </Link>
+                    )}
+                  </div>
 
-          {successMsg && (
-            <div className="max-w-2xl mx-auto mb-8 p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm text-center">
-              {successMsg}
-            </div>
-          )}
+                  {successMsg && (
+                    <div className="max-w-2xl mx-auto mb-8 p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm text-center">
+                      {successMsg}
+                    </div>
+                  )}
 
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
-            </div>
-          ) : rooms.length === 0 ? (
-            <p className="text-center text-coffee-500 py-20">Belum ada ruangan tersedia.</p>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {loading ? (
+                    <div className="flex justify-center py-20">
+                      <div className="w-10 h-10 border-4 border-coffee-300 border-t-coffee-900 rounded-full animate-spin" />
+                    </div>
+                  ) : rooms.length === 0 ? (
+                    <p className="text-center text-coffee-500 py-20">Belum ada ruangan tersedia.</p>
+                  ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {rooms.map((room) => (
                 <div key={room.id} className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover">
                   <div className="aspect-[4/3] bg-coffee-100 overflow-hidden">
@@ -60,7 +60,7 @@ export default function Reservasi() {
                       <div className="w-full h-full flex items-center justify-center text-coffee-300 text-4xl font-display">COFFEE</div>
                     )}
                   </div>
-                  <div className="p-6">
+                  <div className="p-5 sm:p-6">
                     <h3 className="font-display text-xl font-bold text-coffee-900 mb-2">{room.name}</h3>
                     <p className="text-coffee-500 text-sm mb-4 line-clamp-2">{room.description}</p>
                     <div className="flex items-center gap-4 text-sm text-coffee-600 mb-4">
@@ -93,15 +93,15 @@ export default function Reservasi() {
       <Footer />
 
       {selectedRoom && (
-        <ReservationModal
-          room={selectedRoom}
-          onClose={() => setSelectedRoom(null)}
-          onSuccess={() => {
-            setSuccessMsg('Reservasi berhasil dibuat! Menunggu konfirmasi dari kami.');
-            setSelectedRoom(null);
-          }}
-        />
-      )}
-    </div>
-  );
+                    <ReservationModal
+                      room={selectedRoom}
+                      onClose={() => setSelectedRoom(null)}
+                      onSuccess={() => {
+                        setSuccessMsg('Reservasi berhasil dibuat! Menunggu konfirmasi dari kami.');
+                        setSelectedRoom(null);
+                      }}
+                    />
+                  )}
+              </div>
+              );
 }

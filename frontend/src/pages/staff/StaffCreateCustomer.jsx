@@ -45,44 +45,44 @@ export default function StaffCreateCustomer() {
 
   return (
     <DashboardLayout title="Buat Akun Pelanggan" role={role}>
-      <div className="max-w-lg">
-        <p className="text-coffee-500 mb-6">Buat akun untuk pelanggan yang belum terdaftar.</p>
+        <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm max-w-lg w-full">
+          <p className="text-sm sm:text-base text-coffee-500 mb-6">Buat akun untuk pelanggan yang belum terdaftar.</p>
 
-        {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">{error}</div>}
+          {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-coffee-700 mb-2">Nama</label>
-            <input name="name" value={form.name} onChange={handleChange} className="input-field" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-coffee-700 mb-2">Email</label>
-            <input type="email" name="email" value={form.email} onChange={handleChange} className="input-field" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-coffee-700 mb-2">Telepon</label>
-            <input name="phone" value={form.phone} onChange={handleChange} className="input-field" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-coffee-700 mb-2">Password</label>
-            <input type="password" name="password" value={form.password} onChange={handleChange} className="input-field" required />
-          </div>
-          <p className="text-xs text-coffee-500">Beritahu pelanggan email dan password untuk login nanti.</p>
-          <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
-            {loading ? 'Membuat akun...' : 'Buat Akun Pelanggan'}
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-coffee-700 mb-2">Nama</label>
+                <input name="name" value={form.name} onChange={handleChange} className="input-field" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-coffee-700 mb-2">Email</label>
+                <input type="email" name="email" value={form.email} onChange={handleChange} className="input-field" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-coffee-700 mb-2">Telepon</label>
+                <input name="phone" value={form.phone} onChange={handleChange} className="input-field" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-coffee-700 mb-2">Password</label>
+                <input type="password" name="password" value={form.password} onChange={handleChange} className="input-field" required />
+              </div>
+              <p className="text-xs text-coffee-500">Beritahu pelanggan email dan password untuk login nanti.</p>
+              <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-50">
+                {loading ? 'Membuat akun...' : 'Buat Akun Pelanggan'}
+              </button>
+            </form>
 
-        {success && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <p className="text-green-800 font-medium mb-1">Akun berhasil dibuat!</p>
-            <p className="text-green-700 text-sm">{success.name} - {success.email}</p>
-            <button type="button" onClick={handleOrderForCustomer} className="btn-primary mt-4 text-sm">
-              Pesan untuk Pelanggan Ini
-            </button>
-          </div>
-        )}
-      </div>
+            {success && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                <p className="text-green-800 font-medium mb-1">Akun berhasil dibuat!</p>
+                  <p className="text-green-700 text-sm break-words">{success.name} - {success.email}</p>
+                  <button type="button" onClick={handleOrderForCustomer} className="btn-primary mt-4 text-sm w-full sm:w-auto">
+                    Pesan untuk Pelanggan Ini
+                  </button>
+              </div>
+            )}
+        </div>
     </DashboardLayout>
   );
 }

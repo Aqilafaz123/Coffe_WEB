@@ -297,20 +297,20 @@ export default function Login() {
                   { role: 'Admin', email: 'admin@coffee.shop', color: '#ef4444' },
                   { role: 'Kasir', email: 'kasir@coffee.shop', color: '#f97316' },
                   { role: 'Logistik', email: 'logistik@coffee.shop', color: '#d97706' },
-                  { role: 'User',  email: 'user@coffee.shop',  color: '#22c55e' },
+                  { role: 'User', email: 'user@coffee.shop', color: '#22c55e' },
                 ].map(({ role, email: demoEmail, color }) => (
                   <button
                     key={role}
                     type="button"
                     onClick={() => { setEmail(demoEmail); setPassword('password'); }}
-                    className="demo-row w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs"
+                    className="demo-row w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-xs"
                     style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid #cfe0fb' }}
                   >
-                    <span className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full" style={{ background: color }} />
-                      <span className="font-medium" style={{ color: '#081b56' }}>{role}</span>
-                    </span>
-                    <span style={{ color: '#224fa8', fontFamily: 'monospace' }}>{demoEmail}</span>
+                      <span className="flex items-center gap-2 shrink-0">
+                        <span className="w-2 h-2 rounded-full" style={{ background: color }} />
+                        <span className="font-medium" style={{ color: '#081b56' }}>{role}</span>
+                      </span>
+                      <span className="truncate min-w-0" style={{ color: '#224fa8', fontFamily: 'monospace' }}>{demoEmail}</span>
                   </button>
                 ))}
               </div>
