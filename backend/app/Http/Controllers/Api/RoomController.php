@@ -7,6 +7,7 @@ use App\Models\Room;
 use App\Models\RoomReservation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class RoomController extends Controller
@@ -58,11 +59,20 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'capacity' => ['required', 'integer', 'min:1'],
             'price_per_hour' => ['required', 'numeric', 'min:0'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable', 'string', 'max:2048'],
+            'image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'amenities' => ['nullable', 'array'],
             'amenities.*' => ['string', 'max:50'],
             'is_active' => ['boolean'],
         ]);
+
+        unset($validated['image_file']);
+
+        if ($request->hasFile('image_file')) {
+            $path = $request->file('image_file')->store('rooms', 'public');
+            abort_unless($path, 500, 'Gambar ruangan gagal disimpan.');
+            $validated['image'] = '/api/media/'.$path;
+        }
 
         $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(4);
 
@@ -78,17 +88,35 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'capacity' => ['sometimes', 'integer', 'min:1'],
             'price_per_hour' => ['sometimes', 'numeric', 'min:0'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable', 'string', 'max:2048'],
+            'image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+            'remove_image' => ['sometimes', 'boolean'],
             'amenities' => ['nullable', 'array'],
             'amenities.*' => ['string', 'max:50'],
             'is_active' => ['boolean'],
         ]);
+
+        unset($validated['image_file'], $validated['remove_image']);
+
+        $oldImage = $room->image;
+
+        if ($request->hasFile('image_file')) {
+            $path = $request->file('image_file')->store('rooms', 'public');
+            abort_unless($path, 500, 'Gambar ruangan gagal disimpan.');
+            $validated['image'] = '/api/media/'.$path;
+        } elseif ($request->boolean('remove_image')) {
+            $validated['image'] = null;
+        }
 
         if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']).'-'.Str::random(4);
         }
 
         $room->update($validated);
+
+        if (($request->hasFile('image_file') || $request->boolean('remove_image')) && $oldImage !== $room->image) {
+            $this->deleteLocalMedia($oldImage);
+        }
 
         return response()->json($room);
     }
@@ -101,8 +129,22 @@ class RoomController extends Controller
             ], 422);
         }
 
+        $oldImage = $room->image;
         $room->delete();
+        $this->deleteLocalMedia($oldImage);
 
         return response()->json(['message' => 'Ruangan berhasil dihapus.']);
+    }
+
+    private function deleteLocalMedia(?string $imageUrl): void
+    {
+        if (! $imageUrl || ! str_starts_with($imageUrl, '/api/media/')) {
+            return;
+        }
+
+        $relativePath = substr($imageUrl, strlen('/api/media/'));
+        if (preg_match('#^(products|rooms)/[A-Za-z0-9._-]+$#', $relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }
