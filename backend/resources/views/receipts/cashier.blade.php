@@ -45,7 +45,7 @@
     <div class="header">
         <h1>RAHARDJA</h1>
         <div class="badge">TIKET KASIR &amp; SLIP INVENTORY</div>
-        <p style="font-size: 10px; color: #666; margin-top: 4px;">Jl. Kopi Nusantara No. 123 · Jakarta</p>
+        <p style="font-size: 10px; color: #666; margin-top: 4px;">Kp. Picung, Jl. Kepuh 2 No.86, Sukaasih, Kec. Ps. Kemis, Tangerang</p>
     </div>
 
     @if($order->queue_number)

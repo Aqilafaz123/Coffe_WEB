@@ -33,8 +33,8 @@
     <div class="header">
         <h1>RAHARDJA</h1>
         <p class="sub">ES KRIM, TEH &amp; KOPI</p>
-        <p>Jl. Kopi Nusantara No. 123 · Jakarta</p>
-        <p>Telp: (021) 1234-5678</p>
+        <p>Kp. Picung, Jl. Kepuh 2 No.86, Sukaasih, Kec. Ps. Kemis, Kab. Tangerang, Banten 15560</p>
+        <p>Telp: 0817-371-996</p>
     </div>
 
     <div class="meta">
