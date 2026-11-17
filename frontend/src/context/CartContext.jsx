@@ -31,19 +31,36 @@ export function CartProvider({ children }) {
 
   const getCartKey = (item) => item.id;
 
-  const addItem = (product, quantity = 1, notes = '') => {
+  const addItem = (product, quantity = 1, notes = '', options = null, unitPrice = null) => {
+    const finalUnitPrice = unitPrice != null ? Number(unitPrice) : Number(product.price);
+    const optionsKey = JSON.stringify(options || {});
     setItems((prev) => {
       const existing = prev.find(
-        (i) => i.product.id === product.id && (i.notes || '') === (notes || '')
+        (i) =>
+          i.product.id === product.id &&
+          (i.notes || '') === (notes || '') &&
+          JSON.stringify(i.options || {}) === optionsKey
       );
       if (existing) {
         return prev.map((i) =>
-          i.product.id === product.id && (i.notes || '') === (notes || '')
+          i.product.id === product.id &&
+          (i.notes || '') === (notes || '') &&
+          JSON.stringify(i.options || {}) === optionsKey
             ? { ...i, quantity: i.quantity + quantity }
             : i
         );
       }
-      return [...prev, { id: crypto.randomUUID(), product, quantity, notes: notes || '' }];
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          product,
+          quantity,
+          notes: notes || '',
+          options: options || null,
+          unitPrice: finalUnitPrice,
+        },
+      ];
     });
   };
 
@@ -72,7 +89,10 @@ export function CartProvider({ children }) {
     setOrderForUser(null);
   };
 
-  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  const total = items.reduce(
+    (sum, i) => sum + (i.unitPrice != null ? i.unitPrice : Number(i.product.price)) * i.quantity,
+    0
+  );
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (

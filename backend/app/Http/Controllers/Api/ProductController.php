@@ -49,6 +49,7 @@ class ProductController extends Controller
             'image_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
             'is_featured' => ['boolean'],
             'is_active' => ['boolean'],
+            'is_customizable' => ['boolean'],
             'stock' => ['integer', 'min:0'],
         ]);
 
@@ -79,6 +80,7 @@ class ProductController extends Controller
             'remove_image' => ['sometimes', 'boolean'],
             'is_featured' => ['boolean'],
             'is_active' => ['boolean'],
+            'is_customizable' => ['boolean'],
             'stock' => ['integer', 'min:0'],
         ]);
 

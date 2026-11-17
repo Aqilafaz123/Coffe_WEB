@@ -4,6 +4,7 @@ import { Minus, Plus, Trash2, ShoppingBag, MapPin } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../lib/api';
+import { formatOptionsSummary } from '../lib/customization';
 import api from '../lib/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -26,12 +27,22 @@ export default function Cart() {
     setError('');
     try {
       const itemNotes = items
-        .filter((i) => i.notes)
-        .map((i) => `${i.product.name} (x${i.quantity}): ${i.notes}`)
+        .filter((i) => i.notes || i.options)
+        .map((i) => {
+          const optStr = formatOptionsSummary(i.options);
+          const noteStr = i.notes ? `Catatan: ${i.notes}` : '';
+          const detail = [optStr, noteStr].filter(Boolean).join(' | ');
+          return `${i.product.name} (x${i.quantity})${detail ? `: ${detail}` : ''}`;
+        })
         .join('\n');
 
       const payload = {
-        items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
+        items: items.map((i) => ({
+          product_id: i.product.id,
+          quantity: i.quantity,
+          options: i.options || null,
+          notes: i.notes || null,
+        })),
         notes: itemNotes || null,
         table_location: tableLocation?.trim() || null,
       };
@@ -88,7 +99,19 @@ export default function Cart() {
                         <img src={product.image} alt={product.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-coffee-900 break-words">{product.name}</h3>
-                          <p className="text-coffee-500 text-sm">{formatPrice(product.price)}</p>
+                          {item.options && (
+                            <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-lg my-1 inline-block break-words">
+                              ☕ {formatOptionsSummary(item.options)}
+                            </p>
+                          )}
+                          <p className="text-coffee-600 text-sm">
+                            {formatPrice(item.unitPrice || product.price)}
+                            {item.unitPrice && Number(item.unitPrice) !== Number(product.price) && (
+                              <span className="text-xs text-coffee-400 ml-1.5 line-through">
+                                {formatPrice(product.price)}
+                              </span>
+                            )}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0 ml-auto">
                           <div className="flex items-center gap-1.5 sm:gap-2">

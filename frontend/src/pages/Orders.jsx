@@ -59,7 +59,14 @@ export default function Orders() {
                               <div className="space-y-2 mb-4">
                                 {order.items?.map((item) => (
                         <div key={item.id} className="flex justify-between gap-3 text-sm text-coffee-600">
-                          <span className="min-w-0 break-words">{item.product?.name} x{item.quantity}</span>
+                          <div className="min-w-0">
+                            <span className="break-words font-medium text-coffee-900">{item.product?.name} x{item.quantity}</span>
+                            {(item.options_summary || item.notes) && (
+                              <p className="text-xs text-amber-900 bg-amber-50 px-2 py-0.5 rounded mt-0.5 inline-block break-words">
+                                ☕ {item.options_summary || item.notes}
+                              </p>
+                            )}
+                          </div>
                           <span className="shrink-0">{formatPrice(item.subtotal)}</span>
                         </div>
                       ))}

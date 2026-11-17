@@ -86,6 +86,9 @@
             <tr>
                 <td>
                     <strong>{{ $item->product?->name ?? 'Produk' }}</strong>
+                    @if(!empty($item->options_summary))
+                        <div style="font-size: 8pt; color: #555; margin-top: 2px;">{{ $item->options_summary }}</div>
+                    @endif
                 </td>
                 <td class="right" style="font-size: 13px; font-weight: bold;">x{{ $item->quantity }}</td>
             </tr>

@@ -22,8 +22,8 @@ export default function ProductCard({ product }) {
     setShowModal(true);
   };
 
-  const handleConfirm = ({ quantity, notes }) => {
-    addItem(product, quantity, notes);
+  const handleConfirm = ({ quantity, notes, options, unitPrice }) => {
+    addItem(product, quantity, notes, options, unitPrice);
     setAddedToast(true);
     setTimeout(() => setAddedToast(false), 2500);
   };

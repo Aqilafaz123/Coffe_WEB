@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Minus, QrCode, Wallet, ArrowLeft, CheckCircle, ShoppingBag } from 'lucide-react';
+import { Search, Plus, Minus, QrCode, Wallet, ArrowLeft, CheckCircle, ShoppingBag, Coffee } from 'lucide-react';
 import QRCode from 'qrcode';
 import api, { formatPrice } from '../../lib/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import DownloadReceiptButton from '../../components/DownloadReceiptButton';
 import DownloadCashierTicketButton from '../../components/DownloadCashierTicketButton';
+import OrderConfirmModal from '../../components/OrderConfirmModal';
+import { isProductCustomizable, formatOptionsSummary } from '../../lib/customization';
 
 export default function CashierPOS() {
   const [params, setParams] = useSearchParams();
@@ -56,16 +58,81 @@ export default function CashierPOS() {
     return () => { document.body.style.overflow = oldOverflow; window.removeEventListener('keydown', close); };
   }, [displayQr]);
 
-  const changeQuantity = (product, delta) => {
+  const [customizingProduct, setCustomizingProduct] = useState(null);
+
+  const handleProductClick = (product) => {
+    if (isProductCustomizable(product)) {
+      setCustomizingProduct(product);
+    } else {
+      changeQuantity(product, 1);
+    }
+  };
+
+  const handleConfirmCustomization = ({ quantity, notes: itemNotes, options, unitPrice }) => {
+    setCart((prev) => {
+      const optionsKey = JSON.stringify(options || {});
+      const existing = prev.find(
+        (item) =>
+          item.product.id === customizingProduct.id &&
+          JSON.stringify(item.options || {}) === optionsKey &&
+          (item.notes || '') === (itemNotes || '')
+      );
+      if (existing) {
+        return prev.map((item) =>
+          item === existing ? { ...item, quantity: item.quantity + quantity } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          product: customizingProduct,
+          quantity,
+          options,
+          notes: itemNotes,
+          unitPrice: unitPrice != null ? unitPrice : Number(customizingProduct.price),
+        },
+      ];
+    });
+    setCustomizingProduct(null);
+  };
+
+  const changeCartItemQuantity = (cartItem, delta) => {
     setCart((items) => {
-      const quantity = (items.find((item) => item.product.id === product.id)?.quantity || 0) + delta;
-      if (quantity > product.stock) return items;
-      if (quantity <= 0) return items.filter((item) => item.product.id !== product.id);
-      if (items.some((item) => item.product.id === product.id)) return items.map((item) => item.product.id === product.id ? { ...item, quantity } : item);
-      return [...items, { product, quantity }];
+      const nextQty = cartItem.quantity + delta;
+      if (nextQty > cartItem.product.stock) return items;
+      if (nextQty <= 0) return items.filter((item) => item !== cartItem);
+      return items.map((item) => (item === cartItem ? { ...item, quantity: nextQty } : item));
     });
   };
-  const total = cart.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
+
+  const changeQuantity = (product, delta) => {
+    setCart((items) => {
+      const existing = items.find((item) => item.product.id === product.id && !item.options);
+      const quantity = (existing?.quantity || 0) + delta;
+      if (quantity > product.stock) return items;
+      if (quantity <= 0) return items.filter((item) => item !== existing);
+      if (existing) {
+        return items.map((item) => (item === existing ? { ...item, quantity } : item));
+      }
+      return [
+        ...items,
+        {
+          id: crypto.randomUUID(),
+          product,
+          quantity,
+          unitPrice: Number(product.price),
+          options: null,
+          notes: '',
+        },
+      ];
+    });
+  };
+
+  const total = cart.reduce(
+    (sum, item) => sum + (item.unitPrice != null ? item.unitPrice : Number(item.product.price)) * item.quantity,
+    0
+  );
   const categories = [...new Map(products.filter((p) => p.category).map((p) => [p.category.id, p.category])).values()];
   const visibleProducts = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()) && (category === 'all' || String(p.category_id) === category));
 
@@ -76,7 +143,12 @@ export default function CashierPOS() {
       const { data } = await api.post('/orders', {
         order_source: 'pos', guest_name: name.trim() || 'Pelanggan Walk-in',
         table_location: table.trim() || null, notes: notes.trim() || null,
-        items: cart.map((item) => ({ product_id: item.product.id, quantity: item.quantity })),
+        items: cart.map((item) => ({
+          product_id: item.product.id,
+          quantity: item.quantity,
+          options: item.options || null,
+          notes: item.notes || null,
+        })),
       });
       setOrder(data); setCart([]); setParams({ order: String(data.id) }, { replace: true });
     } catch (err) { setError(err.response?.data?.message || 'Pesanan gagal dibuat.'); }
@@ -167,7 +239,35 @@ export default function CashierPOS() {
                       <section className="lg:col-span-3 min-w-0">
                         <div className="relative mb-4"><Search size={20} className="absolute left-3 top-3.5 text-coffee-400" /><input aria-label="Cari produk" value={search} onChange={(e) => setSearch(e.target.value)} className="input-field pl-11 bg-white" placeholder="Cari produk..." /></div>
                         <div className="flex gap-2 overflow-x-auto pb-3 mb-3"><button onClick={() => setCategory('all')} className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm whitespace-nowrap shrink-0 ${category === 'all' ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-700'}`}>Semua</button>{categories.map((c) => <button key={c.id} onClick={() => setCategory(String(c.id))} className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm whitespace-nowrap shrink-0 ${category === String(c.id) ? 'bg-coffee-900 text-white' : 'bg-white text-coffee-700'}`}>{c.name}</button>)}</div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">{visibleProducts.map((product) => <button key={product.id} onClick={() => changeQuantity(product, 1)} disabled={product.stock <= 0} className="text-left bg-white rounded-2xl overflow-hidden border border-coffee-100 hover:border-coffee-400 disabled:opacity-40 transition-colors flex flex-col"><div className="w-full">{product.image && <img src={product.image} alt="" className="h-24 sm:h-28 w-full object-cover" />}</div><div className="p-3 sm:p-4 flex-1 flex flex-col justify-between w-full min-w-0"><p className="font-semibold text-sm sm:text-base text-coffee-900 line-clamp-2">{product.name}</p><div><p className="text-coffee-600 text-xs sm:text-sm mt-1">{formatPrice(product.price)}</p><p className="text-[11px] sm:text-xs text-coffee-400 mt-1.5">Stok {product.stock}</p></div></div></button>)}</div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                          {visibleProducts.map((product) => {
+                            const customizable = isProductCustomizable(product);
+                            return (
+                              <button
+                                key={product.id}
+                                onClick={() => handleProductClick(product)}
+                                disabled={product.stock <= 0}
+                                className="text-left bg-white rounded-2xl overflow-hidden border border-coffee-100 hover:border-coffee-400 disabled:opacity-40 transition-colors flex flex-col group relative"
+                              >
+                                {customizable && (
+                                  <span className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 shadow-sm flex items-center gap-1">
+                                    <Coffee size={10} /> Custom
+                                  </span>
+                                )}
+                                <div className="w-full">
+                                  {product.image && <img src={product.image} alt="" className="h-24 sm:h-28 w-full object-cover" />}
+                                </div>
+                                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between w-full min-w-0">
+                                  <p className="font-semibold text-sm sm:text-base text-coffee-900 line-clamp-2">{product.name}</p>
+                                  <div>
+                                    <p className="text-coffee-600 text-xs sm:text-sm mt-1">{formatPrice(product.price)}</p>
+                                    <p className="text-[11px] sm:text-xs text-coffee-400 mt-1.5">Stok {product.stock}</p>
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                         {!visibleProducts.length && <p className="text-center py-12 text-coffee-500">Produk tidak ditemukan.</p>}
                       </section>
                         <section className="lg:col-span-2 bg-white rounded-2xl p-4 sm:p-5 h-fit lg:sticky lg:top-24 min-w-0">
@@ -175,7 +275,51 @@ export default function CashierPOS() {
                           <input aria-label="Nama pelanggan" value={name} onChange={(e) => setName(e.target.value)} maxLength={255} className="input-field mb-3" placeholder="Nama pelanggan (opsional)" />
                           <input aria-label="Nomor meja" value={table} onChange={(e) => setTable(e.target.value)} maxLength={100} className="input-field mb-4" placeholder="Meja / lokasi (opsional)" />
                           {!cart.length && <p className="py-8 text-center text-coffee-400 text-sm">Ketuk produk untuk menambahkan.</p>}
-                          {cart.map(({ product, quantity }) => <div key={product.id} className="py-3 border-b border-coffee-100"><p className="font-medium text-coffee-900 mb-2 break-words">{product.name}</p><div className="flex flex-wrap items-center justify-between gap-2"><span className="text-sm text-coffee-600">{formatPrice(Number(product.price) * quantity)}</span><div className="flex items-center gap-2 sm:gap-3 ml-auto"><button aria-label={`Kurangi ${product.name}`} onClick={() => changeQuantity(product, -1)} className="p-2 sm:p-2.5 bg-coffee-50 rounded-lg"><Minus size={16} /></button><span className="min-w-[1.25rem] text-center font-medium text-sm">{quantity}</span><button aria-label={`Tambah ${product.name}`} disabled={quantity >= product.stock} onClick={() => changeQuantity(product, 1)} className="p-2 sm:p-2.5 bg-coffee-50 rounded-lg disabled:opacity-30"><Plus size={16} /></button></div></div></div>)}
+                          {cart.map((cartItem) => {
+                            const unitPrice = cartItem.unitPrice != null ? cartItem.unitPrice : Number(cartItem.product.price);
+                            return (
+                              <div key={cartItem.id || cartItem.product.id} className="py-3 border-b border-coffee-100">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <p className="font-medium text-coffee-900 break-words">{cartItem.product.name}</p>
+                                  {cartItem.options && (
+                                    <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shrink-0">
+                                      Custom
+                                    </span>
+                                  )}
+                                </div>
+                                {cartItem.options && (
+                                  <p className="text-xs text-coffee-600 mb-2 bg-coffee-50 p-1.5 rounded-lg break-words">
+                                    ☕ {formatOptionsSummary(cartItem.options)}
+                                  </p>
+                                )}
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="text-sm text-coffee-600 font-medium">
+                                    {formatPrice(unitPrice * cartItem.quantity)}
+                                  </span>
+                                  <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+                                    <button
+                                      aria-label={`Kurangi ${cartItem.product.name}`}
+                                      onClick={() => changeCartItemQuantity(cartItem, -1)}
+                                      className="p-2 sm:p-2.5 bg-coffee-50 rounded-lg hover:bg-coffee-100"
+                                    >
+                                      <Minus size={16} />
+                                    </button>
+                                    <span className="min-w-[1.25rem] text-center font-medium text-sm">
+                                      {cartItem.quantity}
+                                    </span>
+                                    <button
+                                      aria-label={`Tambah ${cartItem.product.name}`}
+                                      disabled={cartItem.quantity >= cartItem.product.stock}
+                                      onClick={() => changeCartItemQuantity(cartItem, 1)}
+                                      className="p-2 sm:p-2.5 bg-coffee-50 rounded-lg hover:bg-coffee-100 disabled:opacity-30"
+                                    >
+                                      <Plus size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
                           <textarea aria-label="Catatan pesanan" value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field mt-4" placeholder="Catatan pesanan (opsional)" rows={2} />
                           <div className="flex justify-between gap-3 text-lg font-bold text-coffee-900 my-5"><span>Total</span><span className="shrink-0">{formatPrice(total)}</span></div>
                           <button onClick={createOrder} disabled={busy || !cart.length} className="btn-primary w-full py-3.5 sm:py-4 disabled:opacity-50">{busy ? 'Membuat Pesanan...' : 'Lanjut Pembayaran'}</button>
@@ -195,6 +339,13 @@ export default function CashierPOS() {
                             <p className="text-coffee-500 text-xs sm:text-sm mt-4">Scan QRIS dengan e-wallet atau mobile banking<br />Bayar persis sesuai nominal di atas</p>
                           </div>
                         </div>
+      )}
+      {customizingProduct && (
+        <OrderConfirmModal
+          product={customizingProduct}
+          onClose={() => setCustomizingProduct(null)}
+          onConfirm={handleConfirmCustomization}
+        />
       )}
                       </DashboardLayout>
                     );

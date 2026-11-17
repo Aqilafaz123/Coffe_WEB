@@ -167,7 +167,7 @@ class QueueController extends Controller
                 'is_ready'       => $order->queue_number <= $currentCalled,
                 'orders_ahead'   => max(0, $ahead),
                 'created_at'     => $order->created_at->toIso8601String(),
-                'items_summary'  => $order->items->map(fn ($i) => "{$i->quantity}x {$i->product?->name}")->join(', '),
+                'items_summary'  => $order->items->map(fn ($i) => "{$i->quantity}x {$i->product?->name}" . ($i->options_summary ? " [{$i->options_summary}]" : ''))->join(', '),
             ];
         });
 
@@ -220,7 +220,7 @@ class QueueController extends Controller
                 'is_ready'       => $order->queue_number <= $currentCalled,
                 'orders_ahead'   => max(0, $ahead),
                 'created_at'     => $order->created_at->toIso8601String(),
-                'items_summary'  => $order->items->map(fn ($i) => "{$i->quantity}x {$i->product?->name}")->join(', '),
+                'items_summary'  => $order->items->map(fn ($i) => "{$i->quantity}x {$i->product?->name}" . ($i->options_summary ? " [{$i->options_summary}]" : ''))->join(', '),
             ];
         });
 

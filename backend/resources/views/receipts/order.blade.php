@@ -73,7 +73,12 @@
         <tbody>
             @foreach($order->items as $item)
             <tr>
-                <td>{{ $item->product?->name ?? 'Produk' }}</td>
+                <td>
+                    {{ $item->product?->name ?? 'Produk' }}
+                    @if(!empty($item->options_summary))
+                        <div style="font-size: 8pt; color: #555; margin-top: 2px;">{{ $item->options_summary }}</div>
+                    @endif
+                </td>
                 <td class="right">{{ $item->quantity }}</td>
                 <td class="right">{{ $formatPrice($item->unit_price) }}</td>
                 <td class="right">{{ $formatPrice($item->subtotal) }}</td>

@@ -5,7 +5,7 @@ import api, { formatPrice } from '../../lib/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import ImageDropzone from '../../components/ImageDropzone';
 
-const emptyForm = { name: '', description: '', price: '', category_id: '', image: '', stock: 50, is_featured: false, is_active: true };
+const emptyForm = { name: '', description: '', price: '', category_id: '', image: '', stock: 50, is_featured: false, is_active: true, is_customizable: false };
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -46,6 +46,7 @@ export default function AdminProducts() {
       stock: product.stock,
       is_featured: product.is_featured,
       is_active: product.is_active,
+      is_customizable: Boolean(product.is_customizable),
     });
     setImageFile(null);
     setRemoveImage(false);
@@ -67,6 +68,7 @@ export default function AdminProducts() {
       formData.append('category_id', String(Number(form.category_id)));
       formData.append('is_featured', form.is_featured ? '1' : '0');
       formData.append('is_active', form.is_active ? '1' : '0');
+      formData.append('is_customizable', form.is_customizable ? '1' : '0');
 
       if (imageFile) {
         formData.append('image_file', imageFile);
@@ -122,7 +124,14 @@ export default function AdminProducts() {
                             )}
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold text-coffee-900 truncate">{p.name}</p>
-                              <p className="text-xs text-coffee-500 truncate">{p.category?.name || '-'}</p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs text-coffee-500 truncate">{p.category?.name || '-'}</span>
+                                {p.is_customizable && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
+                                    Custom
+                                  </span>
+                                )}
+                              </div>
                               <div className="flex items-center gap-3 mt-1.5 text-sm">
                                 <span className="font-medium text-coffee-900">{formatPrice(p.price)}</span>
                                 <span className="text-xs text-coffee-500">Stok: {p.stock}</span>
@@ -161,7 +170,16 @@ export default function AdminProducts() {
                                 <span className="font-medium text-coffee-900">{p.name}</span>
                               </div>
                             </td>
-                            <td className="px-6 py-4 text-sm text-coffee-600">{p.category?.name}</td>
+                            <td className="px-6 py-4 text-sm text-coffee-600">
+                              <div className="flex items-center gap-2">
+                                <span>{p.category?.name || '-'}</span>
+                                {p.is_customizable && (
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
+                                    Custom
+                                  </span>
+                                )}
+                              </div>
+                            </td>
                             <td className="px-6 py-4 text-sm whitespace-nowrap">{formatPrice(p.price)}</td>
                             <td className="px-6 py-4 text-sm">{p.stock}</td>
                             <td className="px-6 py-4 text-right whitespace-nowrap">
@@ -190,7 +208,21 @@ export default function AdminProducts() {
                           <input type="number" placeholder="Harga" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="input-field" required />
                           <input type="number" placeholder="Stok" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="input-field" />
                         </div>
-                        <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="input-field" required>
+                        <select
+                          value={form.category_id}
+                          onChange={(e) => {
+                            const catId = e.target.value;
+                            const selCat = categories.find((c) => String(c.id) === String(catId));
+                            const isCoffeeCat = selCat && ['hot-coffee', 'cold-coffee', 'cup-coffee'].includes(selCat.slug);
+                            setForm((prev) => ({
+                              ...prev,
+                              category_id: catId,
+                              is_customizable: isCoffeeCat ? true : selCat?.slug === 'dessert' ? false : prev.is_customizable,
+                            }));
+                          }}
+                          className="input-field"
+                          required
+                        >
                           <option value="">Pilih Kategori</option>
                           {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
@@ -213,6 +245,10 @@ export default function AdminProducts() {
                             <label className="flex items-center gap-2 text-sm">
                               <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} />
                               Aktif
+                            </label>
+                            <label className="flex items-center gap-2 text-sm text-coffee-800 font-medium">
+                              <input type="checkbox" checked={form.is_customizable} onChange={(e) => setForm({ ...form, is_customizable: e.target.checked })} />
+                              Bisa Disesuaikan (Gula, Es, Susu, dll)
                             </label>
                           </div>
                           {error && <p className="text-red-600 text-sm" role="alert">{error}</p>}

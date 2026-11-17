@@ -11,7 +11,7 @@ class Product extends Model
 {
     protected $fillable = [
         'category_id', 'name', 'slug', 'description', 'price', 'cost_price',
-        'image', 'is_featured', 'is_active', 'stock',
+        'image', 'is_featured', 'is_active', 'is_customizable', 'stock',
     ];
 
     protected function casts(): array
@@ -21,6 +21,7 @@ class Product extends Model
             'cost_price' => 'decimal:2',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'is_customizable' => 'boolean',
         ];
     }
 

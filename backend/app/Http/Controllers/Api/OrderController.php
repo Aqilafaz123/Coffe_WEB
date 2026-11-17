@@ -48,8 +48,10 @@ class OrderController extends Controller
 
         $rules = [
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'distinct', 'exists:products,id'],
+            'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.options' => ['nullable', 'array'],
+            'items.*.notes' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string'],
             'table_location' => ['nullable', 'string', 'max:100'],
             'discount' => ['nullable', 'numeric', 'min:0'],
@@ -99,13 +101,31 @@ class OrderController extends Controller
                     abort(422, "Stok {$product->name} tidak mencukupi.");
                 }
 
-                $lineSubtotal = $product->price * $item['quantity'];
+                $extraPrice = 0;
+                $options = $item['options'] ?? null;
+                if (!empty($options['addons']) && is_array($options['addons'])) {
+                    foreach ($options['addons'] as $addon) {
+                        $addonQty = (int) ($addon['quantity'] ?? 1);
+                        $addonPrice = (float) ($addon['price'] ?? 0);
+                        if ($addonQty > 0 && $addonPrice > 0) {
+                            $extraPrice += $addonPrice * $addonQty;
+                        }
+                    }
+                }
+                if (!empty($options['milk_price'])) {
+                    $extraPrice += (float) $options['milk_price'];
+                }
+
+                $unitPrice = $product->price + $extraPrice;
+                $lineSubtotal = $unitPrice * $item['quantity'];
                 $subtotal += $lineSubtotal;
 
                 $orderItems[] = [
                     'product_id' => $product->id,
                     'quantity' => $item['quantity'],
-                    'unit_price' => $product->price,
+                    'options' => $options,
+                    'notes' => $item['notes'] ?? null,
+                    'unit_price' => $unitPrice,
                     'cost_price' => $product->calculateUnitCost(),
                     'subtotal' => $lineSubtotal,
                 ];
