@@ -18,6 +18,7 @@ export default function Payment() {
   const [processing, setProcessing] = useState(false);
   const [paid, setPaid] = useState(false);
   const [cashPending, setCashPending] = useState(false);
+  const [cashReceived, setCashReceived] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [voucherCode, setVoucherCode] = useState('');
@@ -123,14 +124,18 @@ export default function Payment() {
   };
 
   const handleCashPay = async () => {
+    if (isStaff && (cashReceived === '' || !Number.isFinite(Number(cashReceived)) || Number(cashReceived) < Number(order.total))) {
+      setError('Uang diterima kurang dari total belanja.');
+      return;
+    }
     const msg = isStaff
-      ? 'Konfirmasi pelanggan sudah membayar tunai?'
+      ? `Terima tunai ${formatPrice(cashReceived)} dan kembalikan ${formatPrice(Number(cashReceived) - Number(order.total))}?`
       : 'Pilih bayar tunai di kasir? Setelah ini, datang ke kasir untuk menyelesaikan pembayaran.';
     if (!confirm(msg)) return;
     setProcessing(true);
     setError('');
     try {
-      const { data } = await api.post(`/orders/${orderId}/pay`, { payment_method: 'cash' });
+      const { data } = await api.post(`/orders/${orderId}/pay`, { payment_method: 'cash', ...(isStaff ? { cash_received: Number(cashReceived) } : {}) });
       if (isStaff) {
         setOrder(data);
         setPaid(true);
@@ -187,6 +192,12 @@ export default function Payment() {
                       <CheckCircle size={56} className="mx-auto text-green-500 mb-4" />
                       <h2 className="font-display text-2xl font-bold text-coffee-900 mb-2">Pembayaran Berhasil!</h2>
                       <p className="text-coffee-500 mb-6">Pesanan Anda sedang diproses.</p>
+                      {order?.payment_method === 'cash' && order.cash_received != null && (
+                        <div className="text-sm text-coffee-700 mb-6 space-y-2">
+                          <p>Uang diterima: <strong>{formatPrice(order.cash_received)}</strong></p>
+                          <p>Kembalian: <strong>{formatPrice(Number(order.cash_received) - Number(order.total))}</strong></p>
+                        </div>
+                      )}
                         <div className="flex flex-wrap gap-3 justify-center items-center">
                           {order && (
                             <DownloadReceiptButton orderId={order.id} orderNumber={order.order_number} />
@@ -301,9 +312,25 @@ export default function Payment() {
                       {isStaff && !qrisImage && <button onClick={handleConfirmQris} disabled={processing || !order.has_payment_proof} className="btn-primary w-full mt-3 disabled:opacity-50">Konfirmasi Dana QRIS Diterima</button>}
                     </>
                   )}
+                  {isStaff && (
+                    <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                      <label htmlFor="cash-received" className="block text-sm font-medium text-coffee-900 mb-2">Uang diterima (Rp)</label>
+                      <input id="cash-received" type="number" min="0" max="9999999999.99" step="0.01" inputMode="decimal" value={cashReceived} onChange={(e) => setCashReceived(e.target.value)} disabled={processing || order.has_payment_proof} className="input-field bg-white" placeholder="Masukkan uang pelanggan" aria-describedby="cash-change" />
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {[Number(order.total), ...[20000, 50000, 100000].filter((amount) => amount > Number(order.total))].map((amount) => (
+                          <button key={amount} type="button" onClick={() => setCashReceived(String(amount))} disabled={processing || order.has_payment_proof} className="px-3 py-2 bg-white rounded-lg text-sm border border-amber-200 disabled:opacity-50">{formatPrice(amount)}</button>
+                        ))}
+                      </div>
+                      <p id="cash-change" aria-live="polite" className="mt-3 text-sm text-coffee-800">
+                        {cashReceived !== '' && Number(cashReceived) < Number(order.total)
+                          ? <>Uang kurang: <strong>{formatPrice(Number(order.total) - Number(cashReceived))}</strong></>
+                          : <>Kembalian: <strong>{formatPrice(Math.max(0, Number(cashReceived) - Number(order.total)))}</strong></>}
+                      </p>
+                    </div>
+                  )}
                   <button
                     onClick={handleCashPay}
-                    disabled={processing || order.has_payment_proof}
+                    disabled={processing || voucherLoading || order.has_payment_proof || (isStaff && (cashReceived === '' || !Number.isFinite(Number(cashReceived)) || Number(cashReceived) < Number(order.total) || Number(cashReceived) > 9999999999.99))}
                     className="w-full mt-3 flex items-center justify-center gap-2 py-3 border-2 border-coffee-200 rounded-xl text-coffee-700 hover:border-coffee-400 hover:bg-coffee-50 disabled:opacity-50"
                   >
                     <Wallet size={18} />

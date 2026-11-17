@@ -117,6 +117,23 @@ class QrisPaymentTest extends TestCase
         $this->postJson("/api/orders/{$id}/pay", ['payment_method' => 'cash', 'cash_received' => 50000])->assertUnprocessable();
     }
 
+    public function test_online_cash_payment_requires_sufficient_cash_and_saves_received_amount(): void
+    {
+        $customer = User::factory()->create();
+        $cashier = User::factory()->create(['role' => 'cashier']);
+        $order = Order::create(['order_number' => 'ONLINE-CASH', 'user_id' => $customer->id, 'subtotal' => 30000, 'discount' => 5000, 'total' => 25000, 'status' => 'awaiting_payment', 'payment_status' => 'unpaid']);
+        $url = "/api/orders/{$order->id}/pay";
+        $this->actingAs($customer)->postJson($url, ['payment_method' => 'cash'])->assertOk();
+        $this->assertSame('unpaid', $order->fresh()->payment_status);
+        $this->actingAs($cashier)->postJson($url, ['payment_method' => 'cash'])->assertUnprocessable();
+        $this->postJson($url, ['payment_method' => 'cash', 'cash_received' => 20000])->assertUnprocessable();
+        $this->assertSame('unpaid', $order->fresh()->payment_status);
+        $this->assertNull($order->fresh()->cash_received);
+        $this->postJson($url, ['payment_method' => 'cash', 'cash_received' => 50000])->assertOk()
+            ->assertJsonPath('cash_received', '50000.00')->assertJsonPath('payment_status', 'paid');
+        $this->assertEquals(25000, $order->fresh()->cash_received - $order->fresh()->total);
+    }
+
     public function test_pos_qris_requires_generated_amount_and_only_staff_can_confirm_without_proof(): void
     {
         $customer = User::factory()->create();

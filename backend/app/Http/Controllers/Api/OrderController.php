@@ -303,7 +303,7 @@ class OrderController extends Controller
         }
 
         if ($user->isSuperadmin() || $user->isCashier()) {
-            if ($order->order_source === 'pos' && $validated['payment_method'] === 'cash') {
+            if ($validated['payment_method'] === 'cash') {
                 abort_unless(isset($validated['cash_received']) && (float) $validated['cash_received'] >= (float) $order->total, 422, 'Uang diterima kurang dari total belanja.');
             }
             $order = DB::transaction(function () use ($order, $paymentService, $validated) {
