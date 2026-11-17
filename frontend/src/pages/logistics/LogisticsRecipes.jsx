@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../../lib/media';
 import { useEffect, useState } from 'react';
 import { ScrollText, Plus, Trash2, Edit3, CheckCircle, AlertCircle, X, Search } from 'lucide-react';
 import api, { formatPrice } from '../../lib/api';
@@ -167,7 +168,7 @@ export default function LogisticsRecipes() {
                     <div>
                       <div className="flex items-start gap-3 mb-3">
                         <img
-                          src={product.image}
+                          src={resolveMediaUrl(product.image)}
                           alt={product.name}
                           className="w-14 h-14 rounded-xl object-cover shrink-0 border border-coffee-100"
                         />

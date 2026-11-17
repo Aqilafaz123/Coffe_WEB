@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { useEffect, useRef, useState } from 'react';
 import { UploadCloud, Image as ImageIcon, RefreshCw, Trash2 } from 'lucide-react';
 
@@ -39,7 +40,7 @@ export default function ImageDropzone({
     setImgError(false);
   }, [existingUrl, removed]);
 
-  const previewSrc = objectUrl || (!removed ? existingUrl : '');
+  const previewSrc = objectUrl || (!removed ? resolveMediaUrl(existingUrl) : '');
 
   const handleFileSelect = (selected) => {
     if (!selected) return;

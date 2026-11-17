@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Wifi, CalendarCheck } from 'lucide-react';
@@ -55,7 +56,7 @@ export default function Reservasi() {
                 <div key={room.id} className="bg-white rounded-2xl overflow-hidden shadow-sm card-hover">
                   <div className="aspect-[4/3] bg-coffee-100 overflow-hidden">
                     {room.image ? (
-                      <img src={room.image} alt={room.name} className="w-full h-full object-cover" />
+                      <img src={resolveMediaUrl(room.image)} alt={room.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-coffee-300 text-4xl font-display">COFFEE</div>
                     )}

@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { useState } from 'react';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { formatPrice } from '../lib/api';
@@ -28,7 +29,7 @@ export default function OrderConfirmModal({ product, onClose, onConfirm }) {
 
             <div className="flex gap-3 sm:gap-4 p-5 sm:p-6 pb-0 pr-12">
               <img
-                src={product.image || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop'}
+                src={resolveMediaUrl(product.image) || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop'}
                 alt={product.name}
                 className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover shrink-0"
               />

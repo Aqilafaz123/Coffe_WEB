@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ShoppingBag, MapPin } from 'lucide-react';
@@ -85,7 +86,7 @@ export default function Cart() {
                             return (
                     <div key={cartKey} className="bg-white rounded-2xl p-4 shadow-sm">
                       <div className="flex flex-wrap sm:flex-nowrap gap-3 sm:gap-4 items-center">
-                        <img src={product.image} alt={product.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" />
+                        <img src={resolveMediaUrl(product.image)} alt={product.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-coffee-900 break-words">{product.name}</h3>
                           <p className="text-coffee-500 text-sm">{formatPrice(product.price)}</p>

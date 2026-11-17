@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, X, User, LogOut, History, Clock, KeyRound } from 'lucide-react';
@@ -210,7 +211,7 @@ export default function Navbar() {
                                               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-coffee-50 text-left transition-colors"
                                             >
                                               {p.image && (
-                          <img src={p.image} alt="" className="w-10 h-10 rounded-lg object-cover bg-coffee-100 shrink-0" />
+                          <img src={resolveMediaUrl(p.image)} alt="" className="w-10 h-10 rounded-lg object-cover bg-coffee-100 shrink-0" />
                                               )}
                                               <div className="min-w-0 flex-1">
                                                 <p className="text-sm font-medium text-coffee-900 truncate">{p.name}</p>
