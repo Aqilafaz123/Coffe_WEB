@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../lib/media';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +39,7 @@ export default function ProductCard({ product }) {
         )}
         <div className="relative aspect-square overflow-hidden">
           <img
-            src={product.image || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop'}
+            src={resolveMediaUrl(product.image) || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop'}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { X, Minus, Plus, ShoppingBag, Coffee, Sparkles } from 'lucide-react';
+import { resolveMediaUrl } from '../lib/media';
 import { formatPrice } from '../lib/api';
 import {
   isProductCustomizable,
@@ -87,7 +88,7 @@ export default function OrderConfirmModal({ product, onClose, onConfirm }) {
         {/* Header / Product summary */}
         <div className="flex gap-4 p-5 sm:p-6 pb-4 pr-14 border-b border-coffee-100">
           <img
-            src={product.image || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop'}
+            src={resolveMediaUrl(product.image) || 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop'}
             alt={product.name}
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover shrink-0 bg-coffee-50"
           />

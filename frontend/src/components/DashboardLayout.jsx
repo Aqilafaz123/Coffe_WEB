@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, BarChart3, Store, ShoppingBag, UserPlus, Tag, Boxes, ScrollText, History, TrendingUp, KeyRound, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingCart, LogOut, BarChart3, Store, ShoppingBag, UserPlus, Tag, Boxes, ScrollText, History, TrendingUp, KeyRound, Menu, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const sharedOrderLinks = [
@@ -42,6 +42,16 @@ export default function DashboardLayout({ children, title, role }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [openPath, setOpenPath] = useState(null);
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem('dashboard-sidebar-collapsed') === 'true'; }
+    catch { return false; }
+  });
+  const toggleSidebar = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    try { localStorage.setItem('dashboard-sidebar-collapsed', String(next)); }
+    catch { /* Keep the toggle working when storage is unavailable. */ }
+  };
   const sidebarOpen = openPath === location.pathname;
   const links = role === 'superadmin' ? adminLinks : role === 'logistics' ? logisticsLinks : cashierLinks;
   const roleName = role === 'superadmin' ? 'Super Admin' : role === 'logistics' ? 'Staff Logistik' : 'Kasir';
@@ -71,18 +81,19 @@ export default function DashboardLayout({ children, title, role }) {
             )}
 
             <aside
-              className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[82vw] bg-coffee-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out lg:translate-x-0 no-print print:hidden ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+              id="dashboard-sidebar"
+              className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[82vw] bg-coffee-900 text-white flex flex-col transform transition-[width,transform] duration-300 ease-in-out lg:translate-x-0 no-print print:hidden ${collapsed ? 'lg:w-20' : 'lg:w-64'} ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
                 }`}
             >
-              <div className="p-5 sm:p-6 border-b border-white/10">
+              <div className={`p-5 sm:p-6 border-b border-white/10 ${collapsed ? 'lg:px-3' : ''}`}>
                 <div className="flex items-start justify-between gap-2">
-                  <Link to="/" className="flex items-center gap-3 group min-w-0">
+                  <Link to="/" aria-label="Rahardja — beranda" className="flex items-center gap-3 group min-w-0">
                     <img
                       src="/logo-white.png"
                       alt="Rahardja"
-                      className="h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 shrink-0"
+                      className="h-9 w-auto object-contain transition-[width,transform] duration-300 group-hover:scale-105 shrink-0"
                     />
-                    <div className="flex flex-col min-w-0">
+                    <div className={`flex flex-col min-w-0 ${collapsed ? 'lg:hidden' : ''}`}>
                       <span className="font-display text-lg font-bold text-white tracking-wider leading-none">RAHARDJA</span>
                       <span className="text-[9px] tracking-widest text-gold uppercase font-medium mt-0.5 truncate">Es Krim, Teh &amp; Kopi</span>
                     </div>
@@ -96,49 +107,56 @@ export default function DashboardLayout({ children, title, role }) {
                     <X size={20} />
                   </button>
                 </div>
-                <p className="text-white/50 text-xs mt-2.5 capitalize">{roleName}</p>
+                <p className={`text-white/50 text-xs mt-2.5 capitalize ${collapsed ? 'lg:hidden' : ''}`}>{roleName}</p>
               </div>
 
-              <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+              <nav aria-label="Navigasi dashboard" className={`flex-1 p-4 space-y-1 overflow-y-auto ${collapsed ? 'lg:px-2' : ''}`}>
                 {links.map(({ to, icon: Icon, label }) => (
                   <Link
                     key={to}
                     to={to}
+                    title={label}
+                    aria-label={label}
+                    aria-current={location.pathname === to ? 'page' : undefined}
                     onClick={() => setOpenPath(null)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${location.pathname === to
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${collapsed ? 'lg:justify-center lg:px-0' : ''} ${location.pathname === to
                         ? 'bg-white/15 text-white'
                         : 'text-white/60 hover:text-white hover:bg-white/10'
                       }`}
                   >
                     <Icon size={18} className="shrink-0" />
-                    <span className="truncate">{label}</span>
+                    <span className={`truncate ${collapsed ? 'lg:hidden' : ''}`}>{label}</span>
                   </Link>
                 ))}
               </nav>
 
-              <div className="p-4 border-t border-white/10">
-                  <div className="px-4 py-2 mb-2 min-w-0">
+              <div className={`p-4 border-t border-white/10 ${collapsed ? 'lg:px-2' : ''}`}>
+                  <div className={`px-4 py-2 mb-2 min-w-0 ${collapsed ? 'lg:hidden' : ''}`}>
                     <p className="text-sm font-medium truncate">{user?.name}</p>
                     <p className="text-xs text-white/50 truncate">{user?.email}</p>
                   </div>
                     <Link
                       to="/akun/password"
+                      title="Ganti Password"
+                      aria-label="Ganti Password"
                       onClick={() => setOpenPath(null)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/80 hover:bg-white/10"
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/80 hover:bg-white/10 ${collapsed ? 'lg:justify-center lg:px-0' : ''}`}
                     >
-                      <KeyRound size={18} className="shrink-0" /> Ganti Password
+                      <KeyRound size={18} className="shrink-0" /><span className={collapsed ? 'lg:hidden' : ''}>Ganti Password</span>
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/10 w-full transition-colors"
+                      title="Logout"
+                      aria-label="Logout"
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/10 w-full transition-colors ${collapsed ? 'lg:justify-center lg:px-0' : ''}`}
                     >
                       <LogOut size={18} className="shrink-0" />
-                      Logout
+                      <span className={collapsed ? 'lg:hidden' : ''}>Logout</span>
                     </button>
                 </div>
             </aside>
 
-                    <main className="flex-1 min-w-0 lg:ml-64 print:ml-0 print:p-0">
+                    <main className={`flex-1 min-w-0 transition-[margin] duration-300 ${collapsed ? 'lg:ml-20' : 'lg:ml-64'} print:ml-0 print:p-0`}>
                       <header className="bg-white border-b border-coffee-100 px-4 sm:px-6 lg:px-8 py-3.5 sm:py-5 sticky top-0 z-30 no-print print:hidden">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
@@ -149,6 +167,17 @@ export default function DashboardLayout({ children, title, role }) {
                               aria-label="Buka menu navigasi"
                             >
                               <Menu size={22} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={toggleSidebar}
+                              className="hidden lg:inline-flex p-2 -ml-2 rounded-xl text-coffee-700 hover:bg-coffee-50 shrink-0"
+                              aria-label={collapsed ? 'Perluas sidebar' : 'Minimalkan sidebar'}
+                              title={collapsed ? 'Perluas sidebar' : 'Minimalkan sidebar'}
+                              aria-controls="dashboard-sidebar"
+                              aria-expanded={!collapsed}
+                            >
+                              {collapsed ? <PanelLeftOpen size={22} /> : <PanelLeftClose size={22} />}
                             </button>
                             <h1 className="font-display text-lg sm:text-2xl font-bold text-coffee-900 truncate min-w-0">{title}</h1>
                           </div>

@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../../lib/media';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Pencil, Trash2, X, Image as ImageIcon } from 'lucide-react';
@@ -116,7 +117,7 @@ export default function AdminProducts() {
                         {products.map((p) => (
                           <div key={p.id} className="p-4 flex items-start gap-3">
                             {p.image ? (
-                              <img src={p.image} alt={p.name} className="w-14 h-14 rounded-xl object-cover bg-coffee-50 shrink-0" />
+                              <img src={resolveMediaUrl(p.image)} alt={p.name} className="w-14 h-14 rounded-xl object-cover bg-coffee-50 shrink-0" />
                             ) : (
                               <div className="w-14 h-14 rounded-xl bg-coffee-100 flex items-center justify-center text-coffee-400 shrink-0">
                                 <ImageIcon size={20} />
@@ -161,7 +162,7 @@ export default function AdminProducts() {
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 {p.image ? (
-                                  <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-coffee-50 shrink-0" />
+                                  <img src={resolveMediaUrl(p.image)} alt={p.name} className="w-10 h-10 rounded-lg object-cover bg-coffee-50 shrink-0" />
                                 ) : (
                                   <div className="w-10 h-10 rounded-lg bg-coffee-100 flex items-center justify-center text-coffee-400 shrink-0">
                                     <ImageIcon size={18} />

@@ -1,3 +1,4 @@
+import { resolveMediaUrl } from '../../lib/media';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Plus, Minus, QrCode, Wallet, ArrowLeft, CheckCircle, ShoppingBag, Coffee } from 'lucide-react';
@@ -255,7 +256,7 @@ export default function CashierPOS() {
                                   </span>
                                 )}
                                 <div className="w-full">
-                                  {product.image && <img src={product.image} alt="" className="h-24 sm:h-28 w-full object-cover" />}
+                                  {product.image && <img src={resolveMediaUrl(product.image)} alt="" className="h-24 sm:h-28 w-full object-cover" />}
                                 </div>
                                 <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between w-full min-w-0">
                                   <p className="font-semibold text-sm sm:text-base text-coffee-900 line-clamp-2">{product.name}</p>
