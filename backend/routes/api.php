@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/customers', [UserController::class, 'customers']);
         Route::post('/customers', [UserController::class, 'storeCustomer']);
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+        Route::get('/reports/menu-sales', [\App\Http\Controllers\Api\MenuSalesReportController::class, 'index']);
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
         // Queue — cashier actions
         Route::get('/queue/current', [QueueController::class, 'current']);

@@ -10,6 +10,7 @@ const sharedOrderLinks = [
 
 const adminLinks = [
   { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/laporan-menu', icon: BarChart3, label: 'Laporan Penjualan Menu' },
   { to: '/admin/pnl', icon: TrendingUp, label: 'Laba Rugi (P&L)' },
   { to: '/admin/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,
@@ -24,6 +25,7 @@ const adminLinks = [
 
 const cashierLinks = [
   { to: '/kasir', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/kasir/laporan-menu', icon: BarChart3, label: 'Laporan Penjualan Menu' },
   { to: '/kasir/pos', icon: Store, label: 'Transaksi Offline / POS' },
   { to: '/kasir/pelanggan', icon: UserPlus, label: 'Buat Akun Pelanggan' },
   ...sharedOrderLinks,

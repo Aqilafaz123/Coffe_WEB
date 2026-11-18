@@ -19,6 +19,7 @@ import AdminProducts from './pages/admin/AdminProducts';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminVouchers from './pages/admin/AdminVouchers';
+import MenuSalesReport from './pages/staff/MenuSalesReport';
 import StaffCreateCustomer from './pages/staff/StaffCreateCustomer';
 import Payment from './pages/Payment';
 import PaymentFinish from './pages/PaymentFinish';
@@ -86,6 +87,8 @@ export default function App() {
                 <CashierDashboard />
               </ProtectedRoute>
             } />
+            <Route path="/kasir/laporan-menu" element={<ProtectedRoute roles={['cashier']}><MenuSalesReport /></ProtectedRoute>} />
+            <Route path="/admin/laporan-menu" element={<ProtectedRoute roles={['superadmin']}><MenuSalesReport /></ProtectedRoute>} />
             <Route path="/kasir/pos" element={<ProtectedRoute roles={['cashier']}><CashierPOS /></ProtectedRoute>} />
             <Route path="/kasir/orders" element={
               <ProtectedRoute roles={['cashier']}>
